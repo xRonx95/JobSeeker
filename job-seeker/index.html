@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#102c45" />
+    <meta
+      name="description"
+      content="Isabela Careers: employment and recruiting portal for Isabela City, Basilan"
+    />
+    <title>Job Seeker Dashboard | Isabela Careers</title>
+    <link rel="stylesheet" href="/assets/css/style.css" />
+    <script src="/config.js"></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"
+    ></script>
+    <script defer src="/assets/js/script.js"></script>
+  </head>
+  <body data-portal="seeker">
+    <div class="shell">
+      <div class="main">
+        <header class="site-header">
+          <div class="topbar">
+            <a class="brand" href="/"
+              ><span class="brand-icon">IC</span
+              ><span
+                >ISABELA <strong>CAREERS</strong
+                ><small>ISABELA CITY · BASILAN</small></span
+              ></a
+            ><button
+              id="menuBtn"
+              type="button"
+              class="ghost mobile"
+              aria-label="Toggle navigation"
+              aria-controls="nav"
+              aria-expanded="false"
+            >
+              Menu</button
+            ><span class="top-heading"
+              >Job Seeker Portal <span class="dot">●</span> Isabela City,
+              Basilan</span
+            >
+            <div class="top-actions">
+              <span id="signedInAs" class="muted"></span
+              ><button id="authBtn" class="btn small">Log in / Sign up</button
+              ><button id="logoutBtn" class="btn outline small hidden">
+                Log out
+              </button>
+            </div>
+          </div>
+          <nav id="nav" class="primary-nav" aria-label="Main navigation">
+            <button class="nav-link active" data-view="dashboard">
+              My dashboard</button
+            ><button class="nav-link" data-view="home">Find jobs</button
+            ><button class="nav-link" data-view="applications">
+              My applications</button
+            ><button class="nav-link" data-view="profile">My profile</button>
+          </nav>
+        </header>
+        <main id="content">
+          <section id="home" class="view active">
+            <div class="hero">
+              <div class="hero-search-panel">
+                <span class="eyebrow">LOCAL TALENT. LOCAL OPPORTUNITY.</span>
+                <h1>Find the job that fits your life.</h1>
+                <p>
+                  Discover your next opportunity in Isabela City and across
+                  Basilan.
+                </p>
+                <form id="heroSearch" class="hero-search" role="search">
+                  <label class="search-keyword"
+                    ><span class="sr-only">Job title, keyword, or company</span
+                    ><input
+                      id="searchBox"
+                      type="search"
+                      placeholder="Job title, keyword, or company"
+                  /></label>
+                  <label class="search-location"
+                    ><span class="sr-only">Location</span
+                    ><input
+                      id="locationSearch"
+                      type="search"
+                      placeholder="City or location"
+                      value="Isabela City"
+                  /></label>
+                  <button
+                    type="submit"
+                    class="btn search-submit"
+                    aria-label="Search jobs"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="22"
+                      height="22"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      aria-hidden="true"
+                    >
+                      <circle cx="10.5" cy="10.5" r="6.5" />
+                      <path d="m16 16 5 5" /></svg
+                    ><span>Search jobs</span>
+                  </button>
+                </form>
+              </div>
+              <div class="hiring-callout">
+                <h2>Are you hiring?</h2>
+                <p>Connect with talent in your community.</p>
+                <button type="button" class="btn" data-auth="register">
+                  Post a job
+                </button>
+              </div>
+            </div>
+            <div class="opportunity-strip">
+              <span>YOUR NEXT CHAPTER</span>
+              <p>
+                Local opportunities. Meaningful careers.
+                <button type="button" data-goto="jobsArea">
+                  Explore openings <span aria-hidden="true">&rarr;</span>
+                </button>
+              </p>
+            </div>
+            <div class="metrics">
+              <div class="metric">
+                <span>AVAILABLE JOBS</span><strong id="totalJobs">—</strong
+                ><small>Approved listings</small>
+              </div>
+              <div class="metric">
+                <span>COMPANIES HIRING</span
+                ><strong id="totalCompanies">—</strong
+                ><small>With active posts</small>
+              </div>
+              <div class="metric">
+                <span>YOUR APPLICATIONS</span
+                ><strong id="myApplicationCount">—</strong
+                ><small>Submitted applications</small>
+              </div>
+            </div>
+            <section id="jobsArea" class="panel">
+              <div class="section-head">
+                <div>
+                  <span class="eyebrow dark">DISCOVER OPPORTUNITIES</span>
+                  <h2>Find your next opportunity</h2>
+                  <p>Search verified and approved postings.</p>
+                </div>
+              </div>
+              <div class="filters">
+                <select id="categoryFilter">
+                  <option value="">All categories</option>
+                  <option>Administration</option>
+                  <option>Education</option>
+                  <option>Information Technology</option>
+                  <option>Healthcare</option>
+                  <option>Retail & Sales</option>
+                  <option>Hospitality</option>
+                  <option>Construction</option>
+                  <option>Other</option></select
+                ><select id="typeFilter">
+                  <option value="">Any employment type</option>
+                  <option>Full-time</option>
+                  <option>Part-time</option>
+                  <option>Contract</option>
+                  <option>Internship</option>
+                  <option>Remote</option>
+                </select>
+              </div>
+              <div id="jobGrid" class="job-grid">
+                <p class="empty">Loading jobs…</p>
+              </div>
+            </section>
+          </section>
+          <section id="dashboard" class="view">
+            <div class="page-title">
+              <span class="eyebrow dark">YOUR WORKSPACE</span>
+              <h1>Dashboard</h1>
+              <p id="welcome">Manage your activity on Isabela Careers.</p>
+            </div>
+            <div id="dashboardContent"></div>
+          </section>
+          <section id="post" class="view">
+            <div class="page-title">
+              <span class="eyebrow dark">EMPLOYER WORKSPACE</span>
+              <h1>Post a job</h1>
+              <p>
+                Describe your vacancy and the required applicant documents.
+                Listings are reviewed by an admin before publication.
+              </p>
+            </div>
+            <div id="postGate" class="panel"></div>
+            <form id="jobForm" class="panel form-panel hidden">
+              <h3>Job information</h3>
+              <div class="form-grid">
+                <label
+                  >Job title *<input
+                    name="title"
+                    required
+                    maxlength="140"
+                    placeholder="e.g. Office Assistant" /></label
+                ><label
+                  >Category *<select name="category" required>
+                    <option value="">Choose category</option>
+                    <option>Administration</option>
+                    <option>Education</option>
+                    <option>Information Technology</option>
+                    <option>Healthcare</option>
+                    <option>Retail & Sales</option>
+                    <option>Hospitality</option>
+                    <option>Construction</option>
+                    <option>Other</option>
+                  </select></label
+                ><label
+                  >Location *<input
+                    name="location"
+                    required
+                    value="Isabela City, Basilan" /></label
+                ><label
+                  >Employment type *<select name="employment_type" required>
+                    <option value="">Choose type</option>
+                    <option>Full-time</option>
+                    <option>Part-time</option>
+                    <option>Contract</option>
+                    <option>Internship</option>
+                    <option>Remote</option>
+                  </select></label
+                ><label
+                  >Salary (optional)<input
+                    name="salary"
+                    maxlength="80"
+                    placeholder="e.g. ₱15,000–₱20,000/month"
+                /></label>
+              </div>
+              <label
+                >Job description *<textarea
+                  name="description"
+                  rows="5"
+                  required
+                  maxlength="6000"
+                  placeholder="Responsibilities and position overview"
+                ></textarea></label
+              ><label
+                >Qualifications *<textarea
+                  name="qualifications"
+                  rows="4"
+                  required
+                  maxlength="4000"
+                  placeholder="Experience, skills, education"
+                ></textarea></label
+              ><label
+                >Applicant documents required (one per line)<textarea
+                  name="requirements"
+                  rows="4"
+                  placeholder="Resume / CV&#10;Application Letter&#10;Transcript of Records"
+                ></textarea></label
+              ><button class="btn" type="submit">Submit for approval →</button>
+            </form>
+          </section>
+          <section id="applications" class="view">
+            <div class="page-title">
+              <span class="eyebrow dark">TRACK YOUR PROGRESS</span>
+              <h1>Applications</h1>
+              <p>
+                Job seekers can track submissions, and companies can review
+                their candidates.
+              </p>
+            </div>
+            <div id="applicationsContent" class="panel"></div>
+          </section>
+          <section id="admin" class="view">
+            <div class="page-title">
+              <span class="eyebrow dark">SYSTEM MANAGEMENT</span>
+              <h1>Admin control center</h1>
+              <p>
+                Review company registrations, moderate vacancies, and oversee
+                applications and users.
+              </p>
+            </div>
+            <div id="adminContent"></div>
+          </section>
+          <section id="profile" class="view">
+            <div class="page-title">
+              <span class="eyebrow dark">YOUR ACCOUNT</span>
+              <h1>Profile settings</h1>
+              <p>Keep your personal or business details up to date.</p>
+            </div>
+            <div id="profileGate" class="panel"></div>
+            <form id="profileForm" class="panel form-panel hidden">
+              <div class="form-grid">
+                <label
+                  >Full name *<input
+                    name="full_name"
+                    required
+                    maxlength="120" /></label
+                ><label>Phone<input name="phone" maxlength="50" /></label
+                ><label>Location<input name="location" maxlength="120" /></label
+                ><label id="companyNameField"
+                  >Company name<input name="company_name" maxlength="180"
+                /></label>
+              </div>
+              <label
+                >About you / company<textarea
+                  name="bio"
+                  rows="4"
+                  maxlength="2000"
+                ></textarea></label
+              ><button class="btn" type="submit">Save changes</button>
+            </form>
+          </section>
+        </main>
+        <footer class="footer">
+          Isabela Careers · An independent employment portal concept · Please
+          verify employers and never pay to apply.
+        </footer>
+      </div>
+    </div>
+    <dialog id="authDialog" class="modal">
+      <form id="authForm" class="dialog-body">
+        <button type="button" class="close" data-close="authDialog">×</button>
+        <div class="eyebrow dark">WELCOME TO ISABELA CAREERS</div>
+        <h2 id="authTitle">Log in</h2>
+        <p id="authSubtitle" class="muted">Access your dashboard.</p>
+        <div id="registerFields" class="hidden">
+          <label
+            >Register as<select name="requested_role" id="roleSelect">
+              <option value="seeker">Job Seeker</option>
+              <option value="company">Company / Employer</option>
+            </select></label
+          ><label
+            >Full name *<input
+              name="full_name"
+              id="registerName"
+              maxlength="120" /></label
+          ><label id="registerCompanyField" class="hidden"
+            >Company name *<input
+              name="company_name"
+              id="registerCompany"
+              maxlength="180"
+          /></label>
+        </div>
+        <label
+          >Email address<input
+            name="email"
+            type="email"
+            autocomplete="email"
+            required /></label
+        ><label
+          >Password<input
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            minlength="8"
+            required /></label
+        ><button id="authSubmit" class="btn block" type="submit">Log in</button
+        ><button id="toggleAuth" class="text-btn" type="button">
+          New here? Create an account
+        </button>
+      </form>
+    </dialog>
+    <dialog id="jobDialog" class="modal wide">
+      <div class="dialog-body">
+        <button type="button" class="close" data-close="jobDialog">×</button>
+        <div id="jobDetail"></div>
+      </div>
+    </dialog>
+    <dialog id="applyDialog" class="modal wide">
+      <form id="applyForm" class="dialog-body">
+        <button type="button" class="close" data-close="applyDialog">×</button
+        ><span class="eyebrow dark">APPLICATION</span>
+        <h2 id="applyJobTitle">Apply for a position</h2>
+        <p class="muted">
+          Upload the required documents; PDF, JPG, PNG, or DOCX, up to 5 MB
+          each. Documents are private.
+        </p>
+        <input type="hidden" id="applyJobId" />
+        <div id="requiredFiles" class="requirements"></div>
+        <label
+          >Cover letter / additional message<textarea
+            name="cover_letter"
+            maxlength="4000"
+            rows="4"
+            placeholder="Introduce yourself to the employer"
+          ></textarea></label
+        ><label
+          >Upload requirement documents *<input
+            id="documentsInput"
+            type="file"
+            multiple
+            required
+            accept=".pdf,.png,.jpg,.jpeg,.docx" /></label
+        ><button class="btn" type="submit">Submit application</button>
+      </form>
+    </dialog>
+    <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+  </body>
+</html>
