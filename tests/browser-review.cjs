@@ -93,18 +93,6 @@ async function main(){
     }
   };
   await send('Runtime.enable');await send('Page.enable');
-  if(process.argv.includes('--live-desktop')){
-    for(const width of [1024,1440,1920]){
-      await send('Emulation.setDeviceMetricsOverride',{width,height:1000,deviceScaleFactor:1,mobile:false});
-      await send('Page.navigate',{url:'https://jobseeker-neon.vercel.app/'});
-      await wait(1800);
-      const capture=await send('Page.captureScreenshot',{format:'png'});
-      fs.writeFileSync(path.join(output,`live-desktop-${width}.png`),Buffer.from(capture.data,'base64'));
-    }
-    console.log('Captured the live desktop site at 1024, 1440, and 1920 pixels.');
-    await send('Browser.close').catch(()=>{});
-    return;
-  }
   await send('Fetch.enable',{patterns:[{urlPattern:'https://*.supabase.co/*'}]});
   const evaluate=async expression=>(await send('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true})).result.value;
   async function until(expression){for(let i=0;i<100;i++){if(await evaluate(expression))return;await wait(100);}throw new Error('Timed out: '+expression+'\n'+JSON.stringify(await evaluate("({toast:document.querySelector('#toast')?.textContent,invalid:[...document.querySelectorAll(':invalid')].map(x=>({name:x.name,value:x.value,message:x.validationMessage})),admin:document.querySelector('#adminContent')?.textContent.slice(0,500)})"))+'\n'+errors.join('\n'));}
