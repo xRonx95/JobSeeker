@@ -1,0 +1,92 @@
+/* Readable type and the Isabela green palette across every account role. */
+:root {--teal:#168447;--teal-dark:#116735;--teal-light:#eef8f1;--success:#17713e;--ink:#33463d;--heading:#183b29;--muted:#5e7166;--line:#dfe8e2;--bg:#f7faf8;}
+body {font-family:"Segoe UI",Arial,sans-serif;font-size:16px;line-height:1.65;color:var(--ink);}
+h1,h2,h3,h4,h5,h6 {font-family:"Segoe UI",Arial,sans-serif;color:var(--heading);}
+body p {color:var(--muted);}
+body label,body input,body select,body textarea {font-size:15px;}
+body input,body select {min-height:46px;}
+body input[type="checkbox"] {min-height:0;width:17px;height:17px;accent-color:#168447;}
+body .btn,body .mini {font-size:14px;}
+body .btn {background:#168447;border-color:#168447;color:#fff;}
+body .btn:hover {background:#116735;border-color:#116735;}
+body .btn.outline {color:#168447;}
+body .text-button,body .text-btn {color:#13763d;font-size:14px;}
+body .site-header.vacancy-header {background:#113c29;}
+body .vacancy-header .brand-spark {background:#113c29;}
+body .vacancy-header .brand small {font-size:9px;color:#d4e8d8;}
+body .vacancy-header .nav-link {font-size:14px;color:#e0ede3;}
+body .vacancy-header .nav-link.active {border-bottom-color:#a0d7a8;}
+body .vacancy-header .nav-link:hover {color:#bce8c4;}
+body .vacancy-header .top-actions .btn {font-size:13px;min-height:40px;}
+body .vacancy-header .signup-button {background:transparent;border-color:#9bc9a5;color:#e1f4e6;}
+body .vacancy-header .btn.outline {color:#d4eddb;border-color:#8bbd98;}
+body .section-kicker,body .eyebrow.dark {color:#297d48;font-size:11px;}
+body .breadcrumb,body .local-badge {font-size:12px;color:#61766a;}
+body .vacancy-heading h1,body .page-title h1 {font-size:34px;}
+body .heading-dot {color:#168447;}
+body .vacancy-heading p:not(.breadcrumb),body .vacancy-search>p {font-size:15px;}
+body .vacancy-search h2 {font-size:23px;}
+body .vacancy-search-form input {height:48px;font-size:15px;}
+body .vacancy-search-form .btn {font-size:15px;}
+body .audience-filters {gap:12px 18px;}
+body .audience-filters>span {font-size:12px;}
+body .audience-filters label,body .saved-filter {font-size:13px;color:#526b5b;}
+body .vacancy-toolbar>p,body .vacancy-toolbar select,body .vacancy-toolbar .text-button {font-size:13px;}
+body .vacancy-selects select {font-size:13px;max-width:230px;}
+body .vacancy-title {color:#167640;font-size:16px;}
+body .vacancy-company {font-size:12px;color:#63766b;}
+body .vacancy-meta {font-size:12px;color:#63766b;}
+body .vacancy-meta span:last-child {color:#63766b;}
+body .vacancy-row {grid-template-columns:48px minmax(0,1fr) 155px;padding:25px 0;}
+body .vacancy-aside strong,body .vacancy-aside small,body .save-job {font-size:12px;color:#536b5d;}
+body .save-job.is-saved {color:#167640;}
+body .audience-tags span {font-size:11px;color:#246f41;background:#edf7ee;}
+body .employer-monogram,body .vacancy-row:nth-child(n) .employer-monogram {color:#237940;background:#eff8f0;border-color:#d8e8db;}
+body .top-opening {font-size:13px;color:#247747;}
+body .top-opening small {font-size:11px;color:#4d755b;background:#eef6ef;}
+body .sidebar-section h2 {font-size:21px;}
+body .advice-tile strong {font-size:20px;}
+body .advice-tile .section-kicker {font-size:10px;}
+body .advice-tile>span:last-child {font-size:12px;}
+body .interview-tile {background:#eaf5ec;color:#246b3b;}
+body .tile-illustration {color:#cce6d2;}
+body .employer-callout {background:#f0f7f1;border-left-color:#76af84;}
+body .employer-callout p,body .employer-callout .btn,body .compact-metrics span,body .safety-note {font-size:13px;}
+body .compact-metrics strong {color:#19713d;}
+body .resource-card p,body .resource-body,body .directory-search,body .resource-admin-row p {font-size:15px;}
+body .pagination,body .pagination .mini,body .footer {font-size:13px;}
+body .pagination {flex-wrap:wrap;}
+body .tab {font-size:14px;}
+body .tab.active {background:#176e3d;color:#fff;}
+body th {font-size:12px;}
+body td,body td small {font-size:14px;}
+body .stat-mini span {font-size:12px;}
+body .dialog-body>p,body .muted {font-size:15px;}
+body #createdUserDetails p,body #addUserForm>p {font-size:14px;}
+body :focus-visible {outline:3px solid #248348;outline-offset:3px;}
+body .auth-card {width:min(700px,calc(100% - 28px));border:1px solid #e4ebe5;border-radius:25px;max-height:92dvh;}
+body .auth-card-body {position:relative;padding:36px max(24px,calc((100% - 390px)/2)) 42px;text-align:center;}
+body .auth-close {position:absolute;right:20px;top:20px;}
+body .auth-logo {display:block;width:96px;height:96px;object-fit:contain;margin:0 auto 2px;}
+body .auth-brand-name {font-size:10px;font-weight:700;letter-spacing:1.6px;color:#2c6d41;margin:0 0 18px;}
+body .auth-card h2 {font-size:28px;font-weight:500;color:#168447;line-height:1.25;margin:12px 0;}
+body #authSubtitle {font-size:15px;margin:0 0 25px;}
+body .auth-card label {font-size:14px;font-weight:500;text-align:left;margin:0 0 15px;}
+body .auth-card input,body .auth-card select {font-size:16px;border:1px solid #d5ded8;background:#fff;border-radius:4px;min-height:47px;}
+body .auth-card .auth-submit {border-radius:28px;font-size:16px;padding:12px 22px;min-height:47px;margin:7px 0 16px;}
+body .auth-forgot {display:block;color:#42694d;font-size:14px;}
+body #authSwitchPrompt {font-size:14px;margin:9px 0 0;}
+body .auth-switch {color:#14773e;background:transparent;border:0;padding:3px 10px;font-size:15px;font-weight:600;}
+body .auth-switch:hover {text-decoration:underline;}
+body .auth-card .consent-label {display:flex;align-items:flex-start;gap:10px;font-size:13px;font-weight:400;line-height:1.5;}
+body .auth-card .consent-label input {min-height:0;width:17px;height:17px;margin-top:3px;flex-shrink:0;}
+body .consent-label a {color:#13733d;text-decoration:underline;}
+body #authStatus {font-size:14px;margin-bottom:0;}
+body .auth-card .password-error {color:#a42f3c;}
+body .auth-card .password-feedback {color:#176d3c;}
+body .policy-page {max-width:820px;margin:50px auto;padding:0 24px;}
+body .policy-page h1 {font-size:34px;margin:22px 0;}
+body .policy-page h2 {font-size:22px;margin-top:28px;}
+@media(max-width:1100px){body .vacancy-layout{grid-template-columns:minmax(0,1fr) 230px;}body .vacancy-row{grid-template-columns:42px minmax(0,1fr);gap:13px;}body .vacancy-aside{grid-column:2;align-items:flex-start;flex-direction:row;flex-wrap:wrap;gap:8px 16px;}body .vacancy-aside strong{text-align:left;}}
+@media(max-width:800px){body .vacancy-layout{grid-template-columns:minmax(0,1fr);}body .vacancy-header .top-actions{margin-left:0;}body .vacancy-header .brand{white-space:normal;}body .vacancy-header .brand small{letter-spacing:.4px;}body .vacancy-header .primary-nav.open{gap:8px 20px;}body .auth-card-body{padding:34px 24px;}}
+@media(max-width:520px){body .vacancy-header .topbar{gap:10px;}body .vacancy-header .brand{font-size:13px;}body .vacancy-header .brand small{font-size:8px;}body .vacancy-header .top-actions{flex-basis:100%;justify-content:flex-end;}body .vacancy-header .top-actions .btn{font-size:13px;padding:8px 16px;}body .vacancy-header .signup-button{display:inline-flex;}body .vacancy-heading h1{font-size:30px;}body .vacancy-heading p:not(.breadcrumb){font-size:15px;}body .vacancy-search-form .btn{height:46px;}body .vacancy-toolbar{align-items:flex-start;flex-wrap:wrap;}body .vacancy-selects select{max-width:100%;flex-basis:100%;}body .vacancy-row{grid-template-columns:36px minmax(0,1fr);}body .vacancy-title{font-size:16px;}body .vacancy-meta{font-size:12px;}body .vacancy-aside{grid-column:2;}body .pagination>span{font-size:12px;}body .auth-card h2{font-size:25px;}body .auth-card-body{padding:30px 22px;}body .auth-close{right:12px;top:12px;}body .stat-mini span{font-size:11px;}}

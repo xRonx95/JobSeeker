@@ -1,0 +1,25 @@
+<dialog id="authDialog" class="modal auth-card" aria-labelledby="authTitle">
+  <form id="authForm" class="dialog-body auth-card-body">
+    <button type="button" class="close auth-close" data-close="authDialog" aria-label="Close authentication dialog">×</button>
+    <img src="/image/hapisabela.jpg" alt="HAPIsabela" class="auth-logo" width="104" height="104" />
+    <p class="auth-brand-name">ISABELA CAREERS</p>
+    <h2 id="authTitle">Log in to Isabela Careers</h2>
+    <p id="authSubtitle">Your next opportunity starts here.</p>
+    <div id="registerFields" class="hidden">
+      <label>Your name<input name="full_name" id="registerName" maxlength="120" autocomplete="name" placeholder="Your full name" disabled /></label>
+      <label>Create an account as<select name="requested_role" id="roleSelect" disabled><option value="seeker">Job seeker</option><option value="company">Company / Employer</option></select></label>
+      <label id="registerCompanyField" class="hidden">Company name<input name="company_name" id="registerCompany" maxlength="180" autocomplete="organization" placeholder="Company name" disabled /></label>
+    </div>
+    <label>Email address<input name="email" type="email" autocomplete="email" placeholder="Email address" required maxlength="254" /></label>
+    <label>Password<input name="password" id="authPassword" type="password" autocomplete="current-password" placeholder="Password" minlength="8" maxlength="128" required /></label>
+    <div id="signupExtras" class="hidden">
+      <label>Phone number (optional)<input name="phone" id="registerPhone" type="tel" autocomplete="tel" maxlength="50" placeholder="+63 Phone number" disabled /></label>
+      <label class="consent-label"><input type="checkbox" id="signupConsent" disabled /><span>I agree to the <a href="/privacy.html" target="_blank" rel="noopener">Privacy Notice</a> and <a href="/terms.html" target="_blank" rel="noopener">Terms of Use</a>.</span></label>
+    </div>
+    <button id="authSubmit" class="btn block auth-submit" type="submit">Log in</button>
+    <a id="authForgot" href="/reset-password.html" class="auth-forgot">Forgot your password?</a>
+    <p id="authSwitchPrompt">Don't have an account yet?</p>
+    <button id="toggleAuth" class="auth-switch" type="button">Create your account</button>
+    <p id="authStatus" role="status" aria-live="polite"></p>
+  </form>
+</dialog>

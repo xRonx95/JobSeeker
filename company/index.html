@@ -16,6 +16,8 @@
     <!-- Stylesheet -->
     <link rel="stylesheet" href="/assets/css/style.css" />
     <link rel="stylesheet" href="/assets/css/vacancies.css" />
+    <link rel="stylesheet" href="/assets/css/green-theme.css" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
 
     <!-- Supabase Configuration -->
     <script src="/config.js"></script>
@@ -29,6 +31,8 @@
     <script defer src="/assets/js/vacancies.js"></script>
     <script defer src="/assets/js/password.js"></script>
     <script defer src="/assets/js/admin-users.js"></script>
+    <script defer src="/assets/js/auth.js"></script>
+    <script defer src="/assets/js/admin-dashboard.js"></script>
     <!-- Main Application Script -->
     <script defer src="/assets/js/script.js"></script>
   </head>
@@ -50,7 +54,7 @@
   <div class="topbar"><a class="brand" href="/"><span class="brand-icon">IC<span class="brand-spark">✦</span></span><span>ISABELA <strong>CAREERS</strong><small>LOCAL TALENT. REAL OPPORTUNITY.</small></span></a>
   <button id="menuBtn" type="button" class="ghost mobile" aria-label="Toggle navigation" aria-controls="nav" aria-expanded="false">Menu</button>
   <nav id="nav" class="primary-nav" aria-label="Main navigation"><button class="nav-link active" data-view="home">Jobs</button><button class="nav-link" data-view="fairs">Job fairs</button><button class="nav-link" data-view="training">Training</button><button class="nav-link" data-view="advice">Career advice</button><button class="nav-link" data-view="employers">Approved employers</button><button class="nav-link" data-view="dashboard">Dashboard</button><button class="nav-link" data-view="post">Post a job</button><button class="nav-link" data-view="applications">Applications</button><button class="nav-link" data-view="admin">Admin</button><button class="nav-link" data-view="profile">My profile</button></nav>
-  <div class="top-actions"><span id="signedInAs" class="muted"></span><button id="authBtn" type="button" class="btn small">Log in</button><button id="logoutBtn" type="button" class="btn outline small hidden">Log out</button></div></div>
+  <div class="top-actions"><span id="signedInAs" class="muted"></span><button type="button" class="btn small signup-button" data-auth="register">Sign up</button><button id="authBtn" type="button" class="btn small">Log in</button><button id="logoutBtn" type="button" class="btn outline small hidden">Log out</button></div></div>
 </header>
 
         <!-- =====================================
@@ -352,50 +356,34 @@
     <!-- =========================================
          AUTHENTICATION MODAL
     ========================================== -->
-    <dialog id="authDialog" class="modal">
-      <form id="authForm" class="dialog-body">
-        <button
-          type="button"
-          class="close"
-          data-close="authDialog"
-          aria-label="Close authentication dialog"
-        >
-          ×
-        </button>
+    <dialog id="authDialog" class="modal auth-card" aria-labelledby="authTitle">
+  <form id="authForm" class="dialog-body auth-card-body">
+    <button type="button" class="close auth-close" data-close="authDialog" aria-label="Close authentication dialog">×</button>
+    <img src="/image/hapisabela.jpg" alt="HAPIsabela" class="auth-logo" width="104" height="104" />
+    <p class="auth-brand-name">ISABELA CAREERS</p>
+    <h2 id="authTitle">Log in to Isabela Careers</h2>
+    <p id="authSubtitle">Your next opportunity starts here.</p>
+    <div id="registerFields" class="hidden">
+      <label>Your name<input name="full_name" id="registerName" maxlength="120" autocomplete="name" placeholder="Your full name" disabled /></label>
+      <label>Create an account as<select name="requested_role" id="roleSelect" disabled><option value="seeker">Job seeker</option><option value="company">Company / Employer</option></select></label>
+      <label id="registerCompanyField" class="hidden">Company name<input name="company_name" id="registerCompany" maxlength="180" autocomplete="organization" placeholder="Company name" disabled /></label>
+    </div>
+    <label>Email address<input name="email" type="email" autocomplete="email" placeholder="Email address" required maxlength="254" /></label>
+    <label>Password<input name="password" id="authPassword" type="password" autocomplete="current-password" placeholder="Password" minlength="8" maxlength="128" required /></label>
+    <div id="signupExtras" class="hidden">
+      <label>Phone number (optional)<input name="phone" id="registerPhone" type="tel" autocomplete="tel" maxlength="50" placeholder="+63 Phone number" disabled /></label>
+      <label class="consent-label"><input type="checkbox" id="signupConsent" disabled /><span>I agree to the <a href="/privacy.html" target="_blank" rel="noopener">Privacy Notice</a> and <a href="/terms.html" target="_blank" rel="noopener">Terms of Use</a>.</span></label>
+    </div>
+    <button id="authSubmit" class="btn block auth-submit" type="submit">Log in</button>
+    <a id="authForgot" href="/reset-password.html" class="auth-forgot">Forgot your password?</a>
+    <p id="authSwitchPrompt">Don't have an account yet?</p>
+    <button id="toggleAuth" class="auth-switch" type="button">Create your account</button>
+    <p id="authStatus" role="status" aria-live="polite"></p>
+  </form>
+</dialog>
 
-        <div class="eyebrow dark">WELCOME TO ISABELA CAREERS</div>
-
-        <h2 id="authTitle">Log in</h2>
-
-        <p id="authSubtitle" class="muted">Log in with the account provided by your administrator.</p>
 
 
-        <!-- Email -->
-        <label>
-          Email address
-
-          <input name="email" type="email" autocomplete="email" required />
-        </label>
-
-        <!-- Password -->
-        <label>
-          Password
-
-          <input
-            name="password"
-            type="password"
-            autocomplete="current-password"
-            minlength="8"
-            required
-          />
-        </label>
-
-        <button id="authSubmit" class="btn block" type="submit">Log in</button>
-
-        <p class="muted">Need an account? Contact your portal administrator.</p>
-        <a href="/reset-password.html" class="text-btn">Forgot your password?</a>
-      </form>
-    </dialog>
 
     <!-- =========================================
          JOB DETAILS MODAL

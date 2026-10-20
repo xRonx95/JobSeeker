@@ -27,7 +27,7 @@ async function main(){
     if(!file.startsWith(root+path.sep)&&file!==root){res.writeHead(403).end();return;}
     if(fs.existsSync(file)&&fs.statSync(file).isDirectory())file=path.join(file,'index.html');
     if(!fs.existsSync(file)){res.writeHead(404).end();return;}
-    res.setHeader('Content-Type',({'.html':'text/html','.js':'application/javascript','.css':'text/css'})[path.extname(file)]||'text/plain');
+    res.setHeader('Content-Type',({'.html':'text/html','.js':'application/javascript','.css':'text/css','.jpg':'image/jpeg','.ico':'image/x-icon'})[path.extname(file)]||'text/plain');
     res.end(fs.readFileSync(file));
   });
   await new Promise(r=>server.listen(0,'127.0.0.1',r));
@@ -41,10 +41,12 @@ async function main(){
   ws=new WebSocket(tabs.find(x=>x.type==='page').webSocketDebuggerUrl);
   await new Promise((resolve,reject)=>{ws.onopen=resolve;ws.onerror=reject;});
   let seq=0;const pending=new Map(),errors=[];
-  let mockRole='admin', saved=[], content=[], passwordUpdates=0, resetRequests=[];
+  let mockRole='admin', saved=[], content=[], passwordUpdates=0, resetRequests=[], signupRequests=[];
   const mockUser={id:'00000000-0000-4000-8000-000000000001',email:'review@example.test',app_metadata:{provider:'email'},user_metadata:{},aud:'authenticated',created_at:'2026-01-01T00:00:00Z'};
   function send(method,params={}){return new Promise((resolve,reject)=>{const id=++seq;pending.set(id,{resolve,reject});ws.send(JSON.stringify({id,method,params}));});}
   const jobs=Array.from({length:23},(_,i)=>({id:`job-${i}`,company_id:i%2?'b':'a',title:i%2?'Office Assistant':'Software Developer',company_name:i%2?'Basilan Community Services':'Isabela Technology Group',location:'Isabela City, Basilan',category:i%2?'Administration':'Information Technology',employment_type:'Full-time',description:'An opportunity to grow your career in the local community.',qualifications:'Communication and teamwork skills.',requirements:['Resume'],audiences:i%2?['pwd','high-school']:[],salary:i%2?'₱18,000–₱22,000 / month':null,status:'approved',created_at:new Date(Date.UTC(2026,9,20-i)).toISOString()}));
+  const fixtureProfiles=Array.from({length:525},(_,i)=>({id:`profile-${i}`,email:`member-${i}@example.test`,full_name:`Member ${i}`,company_name:i%3===0?`Employer ${i}`:null,role:i%3===0?'company':'seeker',approval_status:i%3===0?'pending':'active',created_at:'2026-01-01T00:00:00Z'}));
+  const fixtureApplications=Array.from({length:527},(_,i)=>({id:`application-${i}`,status:'submitted',created_at:'2026-01-01T00:00:00Z',cover_letter:'Application message',document_paths:[],jobs:{title:'Office Assistant',company_name:'Community Employer'},profiles:{full_name:`Applicant ${i}`,email:`applicant-${i}@example.test`}}));
   ws.onmessage=async event=>{
     const m=JSON.parse(event.data);
     if(m.id){const p=pending.get(m.id);if(!p)return;pending.delete(m.id);m.error?p.reject(new Error(m.error.message)):p.resolve(m.result);}
@@ -52,11 +54,12 @@ async function main(){
     if(m.method==='Fetch.requestPaused'){
       const {request,requestId}=m.params;const url=new URL(request.url);let data=[];
       if(url.pathname==='/auth/v1/user')data=mockUser;
+      if(url.pathname==='/auth/v1/signup'&&request.method==='POST'){signupRequests.push(JSON.parse(request.postData));data={id:'signup-user',email:'new@example.test',identities:[{id:'signup-user'}]};}
       if(url.pathname==='/auth/v1/user'&&request.method==='PUT')passwordUpdates++;
       if(url.pathname==='/auth/v1/recover'&&request.method==='POST'){resetRequests.push({body:JSON.parse(request.postData),redirect:url.searchParams.get('redirect_to')});data={};}
       if(url.pathname==='/rest/v1/profiles'){
         const profile={id:mockUser.id,email:mockUser.email,full_name:'Review account',company_name:'Review employer',role:mockRole,approval_status:'active'};
-        data=url.searchParams.has('id')?profile:[profile,...createdAccounts];
+        data=url.searchParams.has('id')?profile:[profile,...fixtureProfiles,...createdAccounts];
       }
       if(url.pathname==='/rest/v1/saved_jobs'){
         if(request.method==='POST'){const row=JSON.parse(request.postData);saved=[row];}
@@ -64,6 +67,7 @@ async function main(){
         data=saved;
       }
       if(url.pathname==='/rest/v1/jobs')data=jobs;
+      if(url.pathname==='/rest/v1/applications')data=fixtureApplications;
       if(url.pathname==='/rest/v1/rpc/list_approved_employers')data=[{id:'a',company_name:'Isabela Technology Group',location:'Isabela City',bio:'Building opportunities in the community.',open_jobs:12}];
       if(url.pathname==='/rest/v1/career_resources'){
         const kind=url.searchParams.get('kind')?.replace('eq.','');
@@ -72,7 +76,14 @@ async function main(){
         if(request.method==='DELETE')content=content.filter(r=>r.id!==url.searchParams.get('id')?.replace('eq.',''));
         data=kind==='fair'?[{id:'fair-1',kind:'fair',title:'Community career fair',description:'Meet local employers.',body:'Bring your résumé and meet employers.',location:'Isabela City',starts_at:'2026-12-20T01:00:00Z',published:true}]:content.filter(r=>!kind||r.kind===kind);
       }
-      await send('Fetch.fulfillRequest',{requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'application/json'},{name:'Access-Control-Allow-Origin',value:base},{name:'Access-Control-Allow-Methods',value:'GET, POST, PUT, PATCH, DELETE, OPTIONS'},{name:'Access-Control-Allow-Headers',value:'authorization, apikey, content-type, x-client-info, prefer, accept, accept-profile, content-profile, x-supabase-api-version'}],body:Buffer.from(JSON.stringify(data)).toString('base64')});
+      let contentRange;
+      if(['/rest/v1/profiles','/rest/v1/jobs','/rest/v1/applications'].includes(url.pathname)&&Array.isArray(data)){
+        for(const field of ['role','approval_status','status']){const value=url.searchParams.get(field);if(value?.startsWith('eq.'))data=data.filter(row=>row[field]===value.slice(3));}
+        const total=data.length,offset=Number(url.searchParams.get('offset')||0),limit=Number(url.searchParams.get('limit')||1000);
+        data=data.slice(offset,offset+limit);
+        contentRange=data.length?`${offset}-${offset+data.length-1}/${total}`:`*/${total}`;
+      }
+      await send('Fetch.fulfillRequest',{requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'application/json'},{name:'Access-Control-Allow-Origin',value:base},{name:'Access-Control-Allow-Methods',value:'GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS'},{name:'Access-Control-Allow-Headers',value:'authorization, apikey, content-type, x-client-info, prefer, accept, accept-profile, content-profile, x-supabase-api-version'},{name:'Access-Control-Expose-Headers',value:'Content-Range'},...(contentRange?[{name:'Content-Range',value:contentRange}]:[])],body:Buffer.from(request.method==='HEAD'?'':JSON.stringify(data)).toString('base64')});
     }
   };
   await send('Runtime.enable');await send('Page.enable');
@@ -83,7 +94,25 @@ async function main(){
   await send('Page.navigate',{url:base});
   await until("document.querySelectorAll('.vacancy-row').length===10");
   assert.match(await evaluate("document.querySelector('#resultCount').textContent"),/23 job openings/);
-  assert.equal(await evaluate("document.querySelector('.signup-button,#registerFields,#toggleAuth')"),null,'Public signup controls remain');
+  assert.equal(await evaluate("document.querySelector('.signup-button')!==null"),true,'Signup button is missing');
+  const icon=await fetch(base+'/favicon.ico');assert.equal(icon.status,200);assert.equal(Buffer.from(await icon.arrayBuffer()).readUInt16LE(2),1);
+  await evaluate("document.querySelector('#authBtn').click()");
+  const loginShot=await send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(output,'login-green.png'),Buffer.from(loginShot.data,'base64'));
+  await evaluate("document.querySelector('#toggleAuth').click()");
+  assert.deepEqual(await evaluate("[...document.querySelector('#roleSelect').options].map(x=>x.value)"),['seeker','company']);
+  for(const role of ['seeker','company']){
+    await evaluate(`{const f=document.querySelector('#authForm');f.elements.full_name.value='Public ${role}';f.elements.requested_role.value='${role}';f.elements.requested_role.dispatchEvent(new Event('change'));f.elements.email.value='public-${role}@example.test';f.elements.password.value='Signup-only-password1!';document.querySelector('#signupConsent').checked=true;${role==='company'?"f.elements.company_name.value='Public Company';":''}}`);
+    if(role==='company'){const signupShot=await send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(output,'signup-green.png'),Buffer.from(signupShot.data,'base64'));}
+    await evaluate("document.querySelector('#authForm').requestSubmit()");
+    await until("document.querySelector('#authStatus').textContent.includes('Check your email')");
+    assert.equal(signupRequests.at(-1).data.requested_role,role);
+    assert.equal(signupRequests.at(-1).app_metadata,undefined);
+  }
+  const signupsBeforeTamper=signupRequests.length;
+  await evaluate("{const f=document.querySelector('#authForm');const option=document.createElement('option');option.value='admin';option.textContent='Admin';f.elements.requested_role.append(option);f.elements.requested_role.value='admin';f.elements.requested_role.dispatchEvent(new Event('change'));f.elements.password.value='Tamper-only-password1!';f.requestSubmit();}");
+  assert.match(await evaluate("document.querySelector('#authStatus').textContent"),/Choose Job seeker or Company/);
+  assert.equal(signupRequests.length,signupsBeforeTamper,'Public admin signup reached the API');
+  await evaluate("document.querySelector('#authDialog').close()");
   await evaluate("document.querySelector('[data-job-page=\"2\"]').click()");
   assert.match(await evaluate("document.querySelector('#jobPagination').textContent"),/Page 2 of 3/);
   await evaluate("document.querySelector('[data-audience=\"pwd\"]').click()");
@@ -123,6 +152,32 @@ async function main(){
   await send('Emulation.setDeviceMetricsOverride',{width:1365,height:1000,deviceScaleFactor:1,mobile:false});
   await send('Page.navigate',{url:base+'/admin/'});
   await until("document.querySelector('[data-manage-resources]')!==null");
+  assert.equal(await evaluate("document.querySelector('#adminContent').textContent.includes('first 500')"),false);
+  assert.match(await evaluate("document.querySelector('#adminContent .stats-row').textContent"),/526/);
+  assert.match(await evaluate("document.querySelector('#adminContent .stats-row').textContent"),/527/);
+  await evaluate("document.querySelector('[data-admin-tab=\"users\"]').click()");
+  await until("document.querySelector('.admin-pagination')?.textContent.includes('of 526')");
+  assert.equal(await evaluate("document.querySelectorAll('#adminContent tbody tr').length"),25);
+  await evaluate("{const button=document.querySelector('[data-admin-page]');button.disabled=false;button.dataset.adminPage='22';button.click();}");
+  await until("document.querySelector('.admin-pagination')?.textContent.includes('526–526 of 526')");
+  assert.equal(await evaluate("document.querySelectorAll('#adminContent tbody tr').length"),1);
+  await evaluate("document.querySelector('[data-admin-tab=\"applications\"]').click()");
+  await until("document.querySelector('.admin-pagination')?.textContent.includes('of 527')");
+  assert.equal(await evaluate("document.querySelectorAll('#adminContent tbody tr').length"),25);
+  await evaluate("{const button=document.querySelector('[data-admin-page]');button.disabled=false;button.dataset.adminPage='22';button.click();}");
+  await until("document.querySelector('.admin-pagination')?.textContent.includes('526–527 of 527')");
+  await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+  assert.equal(await evaluate('document.documentElement.scrollWidth<=window.innerWidth'),true,'Admin records overflow the mobile page');
+  await send('Emulation.setDeviceMetricsOverride',{width:1365,height:1000,deviceScaleFactor:1,mobile:false});
+  const adminPaginationShot=await send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(output,'admin-pagination.png'),Buffer.from(adminPaginationShot.data,'base64'));
+  await evaluate("document.querySelector('[data-view=\"applications\"]').click()");
+  await until("document.querySelector('#applicationsContent .admin-pagination')?.textContent.includes('of 527')");
+  await evaluate("{const button=document.querySelector('[data-admin-app-page]');button.disabled=false;button.dataset.adminAppPage='22';button.click();}");
+  await until("document.querySelector('#applicationsContent .admin-pagination')?.textContent.includes('526–527 of 527')");
+  await evaluate("document.querySelector('[data-view=\"admin\"]').click()");
+  await until("document.querySelector('[data-manage-resources]')!==null");
+  await evaluate("document.querySelector('[data-admin-tab=\"companies\"]').click()");
+  await until("document.querySelector('#adminContent .admin-pagination')?.textContent.includes('of 175')");
   const sessionBefore=await evaluate("localStorage.getItem('sb-hderthposugfbijwvvjm-auth-token')");
   for(const role of ['seeker','company','admin']){
     await evaluate("document.querySelector('[data-add-user]').click()");
@@ -199,7 +254,7 @@ async function main(){
   await until("document.querySelector('#passwordDone')&&!document.querySelector('#passwordDone').classList.contains('hidden')");
   assert.equal(passwordUpdates,2);
   assert.deepEqual(errors,[],'Browser runtime exceptions');
-  console.log('Browser checks passed: admin creates all three roles without switching sessions, duplicate email errors, password cleanup, public signup removal, and existing portal/password regression checks.');
+  console.log('Browser checks passed: favicon, public seeker/company signup, green auth forms, exact dashboard counts and pagination beyond 500 records, admin account creation, and portal/password regression checks.');
   console.log('Screenshots: .tmp-ui/vacancies-desktop.png and .tmp-ui/vacancies-mobile.png');
   await send('Browser.close').catch(()=>{});
 }

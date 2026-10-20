@@ -7,6 +7,7 @@ const start = html.indexOf('<section id="home"');
 const end = html.indexOf('<section id="dashboard"');
 if (start < 0 || end < 0) throw new Error('Cannot locate shared page sections.');
 html = html.slice(0, start) + fs.readFileSync(path.join(root, 'assets/templates/vacancies.html'), 'utf8') + '\n' + html.slice(end);
+html = html.replace(/<dialog id="authDialog"[\s\S]*?<\/dialog>/,fs.readFileSync(path.join(root,'assets/templates/auth-dialog.html'),'utf8'));
 fs.writeFileSync(path.join(root, 'index.html'), html);
 for (const [folder, role, title] of [
   ['admin', 'admin', 'Administration'],

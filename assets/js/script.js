@@ -43,6 +43,7 @@
     window.__toastTimer = setTimeout(() => t.classList.add("hidden"), 5000);
   };
   let sb = null,
+    authUI = null,
     user = null,
     profile = null,
     jobs = [],
@@ -98,7 +99,7 @@
   });
   const roleNote = () =>
     !user
-      ? "Please log in with the account provided by your administrator."
+      ? "Please log in or create a job seeker or company account."
       : !active()
         ? `Your ${esc(profile?.role || "account")} account status is ${esc(profile?.approval_status || "unknown")}. An admin must approve company accounts before posting.`
         : `This area is not available for your ${esc(profile.role)} account.`;
@@ -136,6 +137,7 @@
       ? `${profile?.full_name || user.email} · ${role || "Member"}`
       : "";
     $("#authBtn").classList.toggle("hidden", !!user);
+    $$(".signup-button").forEach(button => button.classList.toggle("hidden", !!user));
     $("#logoutBtn").classList.toggle("hidden", !user);
     $$('[data-view="admin"]').forEach((e) =>
       e.classList.toggle("hidden", !isAdmin()),
@@ -290,36 +292,9 @@
       btn.disabled = false;
     }
   }
-  function showAuth() {
-    $("#authForm").reset();
-    $("#authDialog").showModal();
-  }
-  async function submitAuth(e) {
-    e.preventDefault();
-    if (!configured())
-      return toast("Configure Supabase in config.js first.", "error");
-    if (!sb)
-      return toast("The database client is unavailable. Reload the page and check your connection.", "error");
-    const btn = $("#authSubmit");
-    btn.disabled = true;
-    const f = new FormData(e.target);
-    try {
-      const email = f.get("email").trim(),
-        password = f.get("password");
-      const { data, error } = await sb.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-      user = data.user;
-      await loadProfile();
-      $("#authDialog").close();
-      await loadJobs();
-      if (enforceRoleRoute()) return;
-      go("dashboard");
-      toast("Welcome back!");
-    } catch (e) {
-      err(e);
-    } finally {
-      btn.disabled = false;
-    }
+  function showAuth(mode = "login") {
+    if (!authUI) return toast("The login service is loading. Please try again.", "error");
+    authUI.show(mode);
   }
   async function signout() {
     try {
@@ -343,6 +318,10 @@
   }
   const table = (headers, rows) =>
     `<div class="table-wrap"><table><thead><tr>${headers.map((x) => `<th>${x}</th>`).join("")}</tr></thead><tbody>${rows || '<tr><td colspan="8">No records yet.</td></tr>'}</tbody></table></div>`;
+  const adminUI = window.IsabelaAdminDashboard.create({
+    client: () => sb, isAdmin, getTab: () => adminTab,
+    esc, badge, fmt, table, statusSelect, docLinks, err,
+  });
   async function dashboard() {
     if (!user) {
       $("#dashboardContent").innerHTML = gate(roleNote());
@@ -484,6 +463,7 @@
     return result.join("") || "No documents";
   }
   async function applications() {
+    if (isAdmin()) return adminUI.renderApplications();
     if (!user || !active()) {
       $("#applicationsContent").innerHTML = gate(roleNote());
       return;
@@ -516,16 +496,6 @@
               .order("created_at", { ascending: false }),
           )
         : [];
-    } else if (isAdmin()) {
-      apps = await q(
-        sb
-          .from("applications")
-          .select(
-            "*,profiles!applications_seeker_id_fkey(full_name,email,phone),jobs(title)",
-          )
-          .order("created_at", { ascending: false })
-          .limit(200),
-      );
     } else {
       apps = [];
     }
@@ -552,77 +522,8 @@
     );
   }
   async function admin() {
-    if (!isAdmin()) {
-      $("#adminContent").innerHTML = gate(roleNote());
-      return;
-    }
-    const [profiles, allJobs, apps] = await Promise.all([
-      q(
-        sb
-          .from("profiles")
-          .select("*")
-          .order("created_at", { ascending: false })
-          .limit(500),
-      ),
-      q(
-        sb
-          .from("jobs")
-          .select("*,profiles!jobs_company_id_fkey(company_name,email)")
-          .order("created_at", { ascending: false })
-          .limit(500),
-      ),
-      q(sb.from("applications").select("id,status").limit(500)),
-    ]);
-    const total = profiles.length;
-    const tabs = `<div class="tabs">${[
-      ["companies", "Companies"],
-      ["jobs", "Job moderation"],
-      ["users", "All users"],
-      ["applications", "Applications"],
-    ]
-      .map(
-        ([id, label]) =>
-          `<button class="tab ${adminTab === id ? "active" : ""}" data-admin-tab="${id}">${label}</button>`,
-      )
-      .join("")}</div>`;
-    let content = "";
-    if (adminTab === "companies") {
-      const companies = profiles.filter((p) => p.role === "company");
-      content = table(
-        ["Company", "Email", "Owner", "Status", "Registered", "Action"],
-        companies
-          .map(
-            (p) =>
-              `<tr><td><strong>${esc(p.company_name || "Unnamed")}</strong></td><td>${esc(p.email)}</td><td>${esc(p.full_name)}</td><td>${badge(p.approval_status)}</td><td>${fmt(p.created_at)}</td><td>${statusSelect(p)}</td></tr>`,
-          )
-          .join(""),
-      );
-    } else if (adminTab === "jobs") {
-      content = table(
-        ["Position", "Employer", "Category", "Posted", "Status", "Moderation"],
-        allJobs
-          .map(
-            (j) =>
-              `<tr><td><strong>${esc(j.title)}</strong><small>${esc(j.location)}</small></td><td>${esc(j.profiles?.company_name || j.profiles?.email || "—")}</td><td>${esc(j.category)}</td><td>${fmt(j.created_at)}</td><td>${badge(j.status)}</td><td><select aria-label="Job moderation" data-job-status="${j.id}">${["pending", "approved", "rejected", "closed"].map((s) => `<option ${s === j.status ? "selected" : ""}>${s}</option>`).join("")}</select></td></tr>`,
-          )
-          .join(""),
-      );
-    } else if (adminTab === "users") {
-      content = table(
-        ["Name", "Email", "Role", "Status", "Registered", "Action"],
-        profiles
-          .map(
-            (p) =>
-              `<tr><td><strong>${esc(p.full_name || "—")}</strong></td><td>${esc(p.email)}</td><td>${badge(p.role)}</td><td>${badge(p.approval_status)}</td><td>${fmt(p.created_at)}</td><td>${statusSelect(p)}</td></tr>`,
-          )
-          .join(""),
-      );
-    } else {
-      content = `<p>Review all application records, documents, and statuses in Applications.</p><button class="btn" data-view="applications">Open applications →</button>`;
-    }
-    $("#adminContent").innerHTML =
-      `<div class="section-head"><h2>Portal administration</h2><button class="btn small" data-manage-resources>Manage fairs, training &amp; advice</button></div><div class="stats-row"><div class="stat-mini"><b>${total}</b><span>Registered users</span></div><div class="stat-mini"><b>${profiles.filter((p) => p.role === "company" && p.approval_status === "pending").length}</b><span>Pending companies</span></div><div class="stat-mini"><b>${allJobs.filter((j) => j.status === "pending").length}</b><span>Jobs awaiting review</span></div><div class="stat-mini"><b>${apps.length}</b><span>Applications *</span></div></div><div class="note">* Dashboard displays the first 500 users/jobs/applications per query. For a larger deployment, add server-side pagination and reporting.</div><div class="panel">${tabs}${content}</div>`;
-    $("#adminContent .section-head").insertAdjacentHTML("beforeend", '<button type="button" class="btn small" data-add-user>+ Add user</button>');
+    if (!isAdmin()) { $("#adminContent").innerHTML = gate(roleNote()); return; }
+    return adminUI.render();
   }
   function statusSelect(p) {
     return p.role === "admin"
@@ -682,6 +583,13 @@
       window.ISABELA_SUPABASE_KEY,
     );
     window.IsabelaPassword.bind(sb);
+    authUI = window.IsabelaAuth.bind({ client: sb, signedIn: async account => {
+      user = account;
+      await loadProfile();
+      if (enforceRoleRoute()) return;
+      await loadJobs();
+      go(isAdmin() ? "admin" : "dashboard");
+    } });
     window.IsabelaAdminUsers.bind({ client: sb, isAdmin, refresh: async () => { adminTab = "users"; await admin(); } });
     const { data, error } = await sb.auth.getUser();
     if (error && error.name !== "AuthSessionMissingError") throw error;
@@ -720,7 +628,6 @@
     const open = $("#nav").classList.toggle("open");
     $("#menuBtn").setAttribute("aria-expanded", String(open));
   });
-  $("#authForm").addEventListener("submit", submitAuth);
   $("#jobForm").addEventListener("submit", submitJob);
   $("#applyForm").addEventListener("submit", submitApplication);
   $("#profileForm").addEventListener("submit", submitProfile);
