@@ -39,5 +39,17 @@ try {
         }
         foreach ($iconImage in $iconImages) { $writer.Write([Byte[]]$iconImage.Bytes) }
     } finally { $writer.Dispose(); $fileStream.Dispose() }
+    $appIconDirectory = Join-Path $projectRoot 'assets/icons'
+    [System.IO.Directory]::CreateDirectory($appIconDirectory) | Out-Null
+    foreach ($appIconSize in @(192, 512)) {
+        $appBitmap = New-Object System.Drawing.Bitmap($appIconSize, $appIconSize)
+        $appGraphics = [System.Drawing.Graphics]::FromImage($appBitmap)
+        $appGraphics.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
+        $appGraphics.Clear([System.Drawing.Color]::White)
+        $appGraphics.DrawImage($sourceImage, 0, 0, $appIconSize, $appIconSize)
+        $appBitmap.Save((Join-Path $appIconDirectory "app-$appIconSize.png"), [System.Drawing.Imaging.ImageFormat]::Png)
+        $appGraphics.Dispose()
+        $appBitmap.Dispose()
+    }
 } finally { $sourceImage.Dispose() }
 Write-Output 'Created favicon.ico with 16, 32, 48, 64, 128, and 256 pixel icons.'

@@ -11,7 +11,9 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
 let chrome,ws,server;
 async function main(){
   const createdAccounts=[];
+  let simulateOffline = false;
   server=http.createServer((req,res)=>{
+    if(simulateOffline&&req.url==='/offline-test'){req.socket.destroy();return;}
     if(req.url==='/api/admin/users'){
       let input='';req.on('data',chunk=>input+=chunk);req.on('end',()=>{
         res.setHeader('Content-Type','application/json');
@@ -27,7 +29,7 @@ async function main(){
     if(!file.startsWith(root+path.sep)&&file!==root){res.writeHead(403).end();return;}
     if(fs.existsSync(file)&&fs.statSync(file).isDirectory())file=path.join(file,'index.html');
     if(!fs.existsSync(file)){res.writeHead(404).end();return;}
-    res.setHeader('Content-Type',({'.html':'text/html','.js':'application/javascript','.css':'text/css','.jpg':'image/jpeg','.ico':'image/x-icon'})[path.extname(file)]||'text/plain');
+    res.setHeader('Content-Type',({'.html':'text/html','.js':'application/javascript','.css':'text/css','.jpg':'image/jpeg','.png':'image/png','.ico':'image/x-icon','.webmanifest':'application/manifest+json'})[path.extname(file)]||'text/plain');
     res.end(fs.readFileSync(file));
   });
   await new Promise(r=>server.listen(0,'127.0.0.1',r));
@@ -91,6 +93,18 @@ async function main(){
     }
   };
   await send('Runtime.enable');await send('Page.enable');
+  if(process.argv.includes('--live-desktop')){
+    for(const width of [1024,1440,1920]){
+      await send('Emulation.setDeviceMetricsOverride',{width,height:1000,deviceScaleFactor:1,mobile:false});
+      await send('Page.navigate',{url:'https://jobseeker-neon.vercel.app/'});
+      await wait(1800);
+      const capture=await send('Page.captureScreenshot',{format:'png'});
+      fs.writeFileSync(path.join(output,`live-desktop-${width}.png`),Buffer.from(capture.data,'base64'));
+    }
+    console.log('Captured the live desktop site at 1024, 1440, and 1920 pixels.');
+    await send('Browser.close').catch(()=>{});
+    return;
+  }
   await send('Fetch.enable',{patterns:[{urlPattern:'https://*.supabase.co/*'}]});
   const evaluate=async expression=>(await send('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true})).result.value;
   async function until(expression){for(let i=0;i<100;i++){if(await evaluate(expression))return;await wait(100);}throw new Error('Timed out: '+expression+'\n'+JSON.stringify(await evaluate("({toast:document.querySelector('#toast')?.textContent,invalid:[...document.querySelectorAll(':invalid')].map(x=>({name:x.name,value:x.value,message:x.validationMessage})),admin:document.querySelector('#adminContent')?.textContent.slice(0,500)})"))+'\n'+errors.join('\n'));}
@@ -149,9 +163,26 @@ async function main(){
   await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
   await wait(200);
   assert.equal(await evaluate('document.documentElement.scrollWidth<=window.innerWidth'),true,'Mobile layout overflows');
+  assert.equal(await evaluate("getComputedStyle(document.querySelector('#mobileDock')).display"),'flex');
+  await evaluate("document.querySelector('[data-mobile-category=\"Information Technology\"]').click()");
+  assert.match(await evaluate("document.querySelector('#resultCount').textContent"),/12 job openings/);
+  assert.equal(await evaluate("document.querySelector('[data-mobile-category=\"Information Technology\"]').getAttribute('aria-pressed')"),'true');
+  await evaluate("document.querySelector('[data-mobile-category=\"\"]').click()");
+  await evaluate("document.querySelector('#mobileFilterToggle').click()");
+  assert.equal(await evaluate("document.querySelector('#mobileFilterToggle').getAttribute('aria-expanded')"),'true');
+  assert.notEqual(await evaluate("getComputedStyle(document.querySelector('#mobileVacancyFilters')).display"),'none');
+  await evaluate("document.querySelector('#mobileFilterToggle').click()");
+  await evaluate("document.querySelector('#mobileDock [data-mobile-destination=\"saved\"]').click()");
+  assert.equal(await evaluate("document.querySelector('#authDialog').open"),true,'Signed-out saved navigation did not request login');
+  await evaluate("document.querySelector('#authDialog').close();document.querySelector('.vacancy-title').click()");
+  assert.equal(await evaluate("document.querySelector('#jobDialog').open"),true);
+  const detailShot=await send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(output,'mobile-job-details.png'),Buffer.from(detailShot.data,'base64'));
+  await evaluate("document.querySelector('#jobDialog').close();window.scrollTo(0,0)");
   await evaluate("document.querySelector('#menuBtn').click()");
   assert.equal(await evaluate("document.querySelector('#menuBtn').getAttribute('aria-expanded')"),'true');
   await evaluate("document.querySelector('#menuBtn').click()");
+  await evaluate('window.scrollTo(0,0)');
+  const homeShot=await send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(output,'mobile-home.png'),Buffer.from(homeShot.data,'base64'));
   const mobile=await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:true});
   fs.writeFileSync(path.join(output,'vacancies-mobile.png'),Buffer.from(mobile.data,'base64'));
   // A synthetic session exercises authenticated UI paths; all requests remain intercepted.
@@ -231,6 +262,11 @@ async function main(){
   await until("document.querySelector('#welcome')?.textContent.includes('Review account')");
   await evaluate("document.querySelector('[data-view=\"home\"]').click()");
   assert.equal(await evaluate("document.querySelector('.save-job').getAttribute('aria-pressed')"),'true','Saved vacancy did not reload');
+  await evaluate("document.querySelector('#mobileDock [data-mobile-destination=\"saved\"]').click()");
+  assert.match(await evaluate("document.querySelector('#resultCount').textContent"),/1 job opening/);
+  assert.equal(await evaluate("document.querySelector('#mobileDock [data-mobile-destination=\"saved\"]').getAttribute('aria-current')"),'page');
+  await evaluate("document.querySelector('#mobileDock [data-mobile-destination=\"discover\"]').click()");
+  assert.match(await evaluate("document.querySelector('#resultCount').textContent"),/23 job openings/);
   await evaluate("document.querySelector('.vacancy-title').click();document.querySelector('#jobDetail [data-apply]').click()");
   assert.equal(await evaluate("document.querySelector('#applyJobId').value"),'job-0','Application form lost the selected job');
   assert.equal(await evaluate("document.querySelector('#applyDialog').open"),true);
@@ -262,8 +298,30 @@ async function main(){
   await evaluate("{const f=document.querySelector('#passwordForm');f.elements.new_password.value='Recovery-only-password1!';f.elements.confirm_password.value=f.elements.new_password.value;f.requestSubmit();}");
   await until("document.querySelector('#passwordDone')&&!document.querySelector('#passwordDone').classList.contains('hidden')");
   assert.equal(passwordUpdates,2);
+  await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+  await send('Page.navigate',{url:base+'/job-seeker/'});
+  await until("document.querySelector('#welcome')?.textContent.includes('Review account')");
+  await evaluate("document.querySelector('#mobileDock [data-mobile-destination=\"account\"]').click()");
+  assert.equal(await evaluate("document.querySelector('#profile').classList.contains('active')"),true);
+  await evaluate("document.querySelector('#mobileDock [data-mobile-destination=\"activity\"]').click()");
+  assert.equal(await evaluate("document.querySelector('#applications').classList.contains('active')"),true);
+  await evaluate("document.querySelector('#mobileDock [data-mobile-destination=\"discover\"]').click()");
+  for(const width of [320,375,430,768]){
+    await send('Emulation.setDeviceMetricsOverride',{width,height:844,deviceScaleFactor:1,mobile:true});
+    assert.equal(await evaluate('document.documentElement.scrollWidth<=window.innerWidth'),true,`Layout overflows at ${width}px`);
+  }
+  const manifest=await(await fetch(base+'/manifest.webmanifest')).json();
+  assert.equal(manifest.display,'standalone');
+  for(const icon of manifest.icons)assert.equal((await fetch(base+icon.src)).status,200);
+  await until("navigator.serviceWorker.controller!==null");
+  const cachedUrls=await evaluate("caches.keys().then(async keys=>(await Promise.all(keys.map(async key=>(await(await caches.open(key)).keys()).map(r=>new URL(r.url).pathname)))).flat())");
+  assert.ok(cachedUrls.every(url=>['/offline.html','/assets/icons/app-192.png'].includes(url)),'Service worker cached private content');
+  simulateOffline = true;
+  await send('Page.navigate',{url:base+'/offline-test'});
+  await until("document.title.includes(\"You're offline\")");
+  simulateOffline = false;
   assert.deepEqual(errors,[],'Browser runtime exceptions');
-  console.log('Browser checks passed: favicon, public seeker/company signup, green auth forms, exact dashboard counts and pagination beyond 500 records, admin account creation, and portal/password regression checks.');
+  console.log('Browser checks passed: app-style mobile navigation, category chips, filter toggle, saved/account/activity flows, detail sheet, 320–768px layouts, install manifest/offline fallback, and all portal/auth regression checks.');
   console.log('Screenshots: .tmp-ui/vacancies-desktop.png and .tmp-ui/vacancies-mobile.png');
   await send('Browser.close').catch(()=>{});
 }

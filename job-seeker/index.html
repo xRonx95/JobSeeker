@@ -3,8 +3,13 @@
   <head>
     <!-- Basic Metadata -->
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#102c45" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#113c29" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="HapIsabela" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/assets/icons/app-192.png?v=hapisabela-mobile-3" />
 
     <meta
       name="description"
@@ -14,13 +19,14 @@
     <title>Job seeker dashboard | HapIsabela</title>
 
     <!-- Stylesheet -->
-    <link rel="stylesheet" href="/assets/css/style.css?v=hapisabela-2" />
-    <link rel="stylesheet" href="/assets/css/vacancies.css?v=hapisabela-2" />
-    <link rel="stylesheet" href="/assets/css/green-theme.css?v=hapisabela-2" />
-    <link rel="icon" href="/favicon.ico?v=hapisabela-2" type="image/x-icon" />
+    <link rel="stylesheet" href="/assets/css/style.css?v=hapisabela-mobile-3" />
+    <link rel="stylesheet" href="/assets/css/vacancies.css?v=hapisabela-mobile-3" />
+    <link rel="stylesheet" href="/assets/css/green-theme.css?v=hapisabela-mobile-3" />
+    <link rel="stylesheet" href="/assets/css/mobile-app.css?v=hapisabela-mobile-3" />
+    <link rel="icon" href="/favicon.ico?v=hapisabela-mobile-3" type="image/x-icon" />
 
     <!-- Supabase Configuration -->
-    <script src="/config.js?v=hapisabela-2"></script>
+    <script src="/config.js?v=hapisabela-mobile-3"></script>
 
     <!-- Supabase JavaScript Library -->
     <script
@@ -28,13 +34,14 @@
       src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"
     ></script>
 
-    <script defer src="/assets/js/vacancies.js?v=hapisabela-2"></script>
-    <script defer src="/assets/js/password.js?v=hapisabela-2"></script>
-    <script defer src="/assets/js/admin-users.js?v=hapisabela-2"></script>
-    <script defer src="/assets/js/auth.js?v=hapisabela-2"></script>
-    <script defer src="/assets/js/admin-dashboard.js?v=hapisabela-2"></script>
+    <script defer src="/assets/js/vacancies.js?v=hapisabela-mobile-3"></script>
+    <script defer src="/assets/js/password.js?v=hapisabela-mobile-3"></script>
+    <script defer src="/assets/js/admin-users.js?v=hapisabela-mobile-3"></script>
+    <script defer src="/assets/js/auth.js?v=hapisabela-mobile-3"></script>
+    <script defer src="/assets/js/admin-dashboard.js?v=hapisabela-mobile-3"></script>
+    <script defer src="/assets/js/mobile.js?v=hapisabela-mobile-3"></script>
     <!-- Main Application Script -->
-    <script defer src="/assets/js/script.js?v=hapisabela-2"></script>
+    <script defer src="/assets/js/script.js?v=hapisabela-mobile-3"></script>
   </head>
 
   <body data-portal="seeker">
@@ -51,7 +58,7 @@
                  TOP NAVIGATION BAR
             ====================================== -->
         <header class="site-header vacancy-header">
-  <div class="topbar"><a class="brand" href="/" aria-label="HapIsabela home"><img class="brand-logo" src="/favicon.ico?v=hapisabela-2" alt="HapIsabela logo" width="64" height="64" /><span class="brand-name">HapIsabela<small>LOCAL TALENT. REAL OPPORTUNITY.</small></span></a>
+  <div class="topbar"><a class="brand" href="/" aria-label="HapIsabela home"><img class="brand-logo" src="/favicon.ico?v=hapisabela-mobile-3" alt="HapIsabela logo" width="64" height="64" /><span class="brand-name">HapIsabela<small>LOCAL TALENT. REAL OPPORTUNITY.</small></span></a>
   <button id="menuBtn" type="button" class="ghost mobile" aria-label="Toggle navigation" aria-controls="nav" aria-expanded="false">Menu</button>
   <nav id="nav" class="primary-nav" aria-label="Main navigation"><button class="nav-link active" data-view="home">Jobs</button><button class="nav-link" data-view="fairs">Job fairs</button><button class="nav-link" data-view="training">Training</button><button class="nav-link" data-view="advice">Career advice</button><button class="nav-link" data-view="employers">Approved employers</button><button class="nav-link" data-view="dashboard">Dashboard</button><button class="nav-link" data-view="post">Post a job</button><button class="nav-link" data-view="applications">Applications</button><button class="nav-link" data-view="admin">Admin</button><button class="nav-link" data-view="profile">My profile</button></nav>
   <div class="top-actions"><span id="signedInAs" class="muted"></span><button type="button" class="btn small signup-button" data-auth="register">Sign up</button><button id="authBtn" type="button" class="btn small">Log in</button><button id="logoutBtn" type="button" class="btn outline small hidden">Log out</button></div></div>
@@ -65,6 +72,8 @@
                      HOME / EXPLORE JOBS
                 ================================= -->
           <section id="home" class="view active">
+  <div class="mobile-welcome"><div><p id="mobileGreeting">Hello, there <span aria-hidden="true">✦</span></p><span>Welcome to HapIsabela</span></div><button type="button" class="mobile-avatar" data-mobile-destination="account" aria-label="Open your account"><span id="mobileInitials">HI</span></button></div>
+  <div class="mobile-page-heading"><span class="mobile-eyebrow">YOUR NEXT CHAPTER</span><h1>Find work.<br><span>Build your future.</span></h1></div>
   <div class="vacancy-heading"><div><p class="breadcrumb">Home <span>/</span> Jobs</p><h1>Job vacancies<span class="heading-dot">.</span></h1><p>Your next opportunity starts here. Find work in Isabela City and beyond.</p></div><span class="local-badge">ISABELA CITY · BASILAN</span></div>
   <div class="vacancy-layout">
     <div class="vacancy-main">
@@ -72,14 +81,16 @@
         <h2 id="findJobsHeading">Find a job here</h2><p>Search by position, skill, company, or location.</p>
         <form id="heroSearch" role="search" class="vacancy-search-form">
           <label><span class="sr-only">Job title, keyword, or company</span><input id="searchBox" type="search" placeholder="Job title, keyword, or company" /></label>
-          <label><span class="sr-only">City or location</span><input id="locationSearch" type="search" placeholder="City or location" /></label>
-          <button type="submit" class="btn">Search</button>
+          <label id="mobileLocationFilters"><span class="sr-only">City or location</span><input id="locationSearch" type="search" placeholder="City or location" /></label>
+          <button type="submit" class="btn mobile-search-submit" aria-label="Search jobs"><svg class="mobile-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><span>Search</span></button>
+          <button id="mobileFilterToggle" type="button" class="mobile-filter-toggle" aria-label="Show job filters" aria-controls="mobileLocationFilters mobileAudienceFilters mobileVacancyFilters" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M3 6h8m6 0h4M3 18h4m6 0h8"/><circle cx="14" cy="6" r="3"/><circle cx="10" cy="18" r="3"/></svg></button>
         </form>
-        <div class="audience-filters"><span>Opportunities for</span><label><input type="checkbox" data-audience="pwd" /> Persons with disabilities</label><label><input type="checkbox" data-audience="overseas" /> Overseas workers</label><label><input type="checkbox" data-audience="high-school" /> High school graduates</label><label><input type="checkbox" data-audience="government" /> Government jobs</label></div>
+        <div id="mobileAudienceFilters" class="audience-filters"><span>Opportunities for</span><label><input type="checkbox" data-audience="pwd" /> Persons with disabilities</label><label><input type="checkbox" data-audience="overseas" /> Overseas workers</label><label><input type="checkbox" data-audience="high-school" /> High school graduates</label><label><input type="checkbox" data-audience="government" /> Government jobs</label></div>
       </section>
+      <section class="mobile-discovery" aria-label="Explore job categories"><div class="mobile-section-heading"><h2>Explore opportunities</h2><span>Made for you</span></div><div class="mobile-category-chips" aria-label="Quick category filters"><button type="button" class="active" data-mobile-category="" aria-pressed="true">All jobs</button><button type="button" data-mobile-category="Information Technology" aria-pressed="false">Technology</button><button type="button" data-mobile-category="Administration" aria-pressed="false">Administration</button><button type="button" data-mobile-category="Healthcare" aria-pressed="false">Healthcare</button><button type="button" data-mobile-category="Retail &amp; Sales" aria-pressed="false">Retail &amp; Sales</button></div><div class="mobile-feature"><div><span>LOCAL TALENT. REAL OPPORTUNITY.</span><h2>Good work.<br>Closer to home.</h2><p>Your next opportunity could be<br>right here in Isabela.</p><button type="button" data-mobile-browse>Explore jobs <span aria-hidden="true">↗</span></button></div><svg class="mobile-city-art" viewBox="0 0 150 180" fill="none" aria-hidden="true"><circle cx="105" cy="42" r="31" fill="currentColor" opacity=".18"/><path d="M15 164h125M31 162V69l45-21v114M76 162V91l44 18v53M31 71l45-22M47 85v10m14-17v10M47 109v10m14-17v10m-14 21v10m14-17v10m32-19v10m14-5v10" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="m7 131 11-13 11 13m-11-12v43m111-21 10-12 10 12m-10-11v33" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></div></section>
       <section id="jobsArea" aria-label="Job vacancies">
         <div class="vacancy-toolbar"><p id="resultCount" role="status" aria-live="polite">Loading vacancies…</p><div><button type="button" class="text-button" id="clearFilters">Reset filters</button><label><span class="sr-only">Sort vacancies</span><select id="sortJobs"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="title">Job title A–Z</option><option value="company">Company A–Z</option></select></label></div></div>
-        <div class="filters vacancy-selects"><select id="categoryFilter" aria-label="Filter by category"><option value="">All categories</option><option>Administration</option><option>Education</option><option>Information Technology</option><option>Healthcare</option><option>Retail &amp; Sales</option><option>Hospitality</option><option>Construction</option><option>Other</option></select><select id="typeFilter" aria-label="Filter by employment type"><option value="">All employment types</option><option>Full-time</option><option>Part-time</option><option>Contract</option><option>Internship</option><option>Remote</option></select><label class="saved-filter"><input type="checkbox" id="savedOnly" /> Saved jobs</label></div>
+        <div id="mobileVacancyFilters" class="filters vacancy-selects"><select id="categoryFilter" aria-label="Filter by category"><option value="">All categories</option><option>Administration</option><option>Education</option><option>Information Technology</option><option>Healthcare</option><option>Retail &amp; Sales</option><option>Hospitality</option><option>Construction</option><option>Other</option></select><select id="typeFilter" aria-label="Filter by employment type"><option value="">All employment types</option><option>Full-time</option><option>Part-time</option><option>Contract</option><option>Internship</option><option>Remote</option></select><label class="saved-filter"><input type="checkbox" id="savedOnly" /> Saved jobs</label></div>
         <div id="jobGrid" class="job-grid"><p class="empty">Loading jobs…</p></div><div id="jobPagination" class="pagination" aria-label="Vacancy pages"></div>
       </section>
     </div>
@@ -359,7 +370,7 @@
     <dialog id="authDialog" class="modal auth-card" aria-labelledby="authTitle">
   <form id="authForm" class="dialog-body auth-card-body">
     <button type="button" class="close auth-close" data-close="authDialog" aria-label="Close authentication dialog">×</button>
-    <img src="/favicon.ico?v=hapisabela-2" alt="HapIsabela logo" class="auth-logo" width="112" height="112" />
+    <img src="/favicon.ico?v=hapisabela-mobile-3" alt="HapIsabela logo" class="auth-logo" width="112" height="112" />
     <p class="auth-brand-name">HapIsabela</p>
     <h2 id="authTitle">Log in to HapIsabela</h2>
     <p id="authSubtitle">Your next opportunity starts here.</p>
@@ -381,6 +392,8 @@
     <p id="authStatus" role="status" aria-live="polite"></p>
   </form>
 </dialog>
+
+
 
 
 
@@ -494,5 +507,15 @@
          NOTIFICATION / TOAST
     ========================================== -->
     <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
-  </body>
+  <!-- MOBILE APP SHELL -->
+<button id="installApp" type="button" class="install-app hidden">Install HapIsabela ↗</button>
+<nav id="mobileDock" class="mobile-dock" aria-label="Mobile navigation">
+  <button type="button" data-mobile-destination="discover" class="active" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/></svg><span>Discover</span></button>
+  <button type="button" data-mobile-destination="saved"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></svg><span>Saved</span></button>
+  <button type="button" data-mobile-destination="activity"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="4"/><path d="M9 5V3h6v2M8 11h8M8 16h5"/></svg><span id="mobileActivityLabel">Activity</span></button>
+  <button type="button" data-mobile-destination="account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg><span>Account</span></button>
+</nav>
+
+<!-- END MOBILE APP SHELL -->
+</body>
 </html>

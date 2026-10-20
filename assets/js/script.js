@@ -97,6 +97,10 @@
     sb: () => sb, user: () => user, view: () => currentView,
     isAdmin, isCompany, fmt, err, toast, go, showAuth, renderJobs,
   });
+  const mobileUI = window.HapMobile.create({
+    user: () => user, profile: () => profile, view: () => currentView,
+    go, showAuth, renderJobs, signout,
+  });
   const roleNote = () =>
     !user
       ? "Please log in or create a job seeker or company account."
@@ -121,6 +125,7 @@
     }
     if (!$("#" + view)) return;
     currentView = view;
+    mobileUI.update(view);
     $$(".view").forEach((x) => x.classList.toggle("active", x.id === view));
     $$(".nav-link").forEach((x) =>
       x.classList.toggle("active", x.dataset.view === view),
@@ -132,6 +137,7 @@
   const gate = (message) =>
     `<div class="note">${message}</div>${!user ? '<button class="btn" data-auth="login">Log in</button>' : ""}`;
   function redrawNav() {
+    mobileUI.update();
     const role = profile?.role;
     $("#signedInAs").textContent = user
       ? `${profile?.full_name || user.email} · ${role || "Member"}`
@@ -190,7 +196,8 @@
     }
   }
   function renderJobs() {
-    return vacancyUI.jobList(jobs);
+    vacancyUI.jobList(jobs);
+    mobileUI.update();
   }
   const reqList = (req) =>
     req?.length
@@ -294,6 +301,7 @@
   }
   function showAuth(mode = "login") {
     if (!authUI) return toast("The login service is loading. Please try again.", "error");
+    closeNavigation();
     authUI.show(mode);
   }
   async function signout() {
