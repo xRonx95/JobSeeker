@@ -1,6 +1,6 @@
 # Isabela Careers — role-separated website
 
-Static HTML/CSS/JS frontend using Supabase Authentication, PostgreSQL, Row Level Security and private Supabase Storage; deploys to Vercel.
+HTML/CSS/JS frontend with a protected Vercel account-creation API, Supabase Authentication, PostgreSQL, Row Level Security, and private Supabase Storage.
 
 ## Folder structure
 
@@ -30,14 +30,28 @@ isabela-careers-role-folders/
 3. Redeploy the updated root folder to the existing Vercel project.
 4. Sign in as an administrator and choose **Manage fairs, training & advice** to create, edit, publish, or delete content. Event times use Philippine time. No invented employers or events are inserted.
 
+### Enable admin-only user creation
+
+1. In Vercel Project Settings > Environment Variables, set `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, and `SUPABASE_SECRET_KEY` for each deployment environment you use. See [.env.example](.env.example) for names. Use a current server secret key; do not put it in `config.js` or browser assets.
+2. Deploy this whole project, including `api/admin/users.mjs`, to Vercel. The API uses Node.js and has no package dependencies; serving only the HTML files does not run it.
+3. In the existing Supabase project's SQL Editor, run [migrations/003-admin-only-accounts.sql](migrations/003-admin-only-accounts.sql). It blocks new Auth users without trusted admin metadata and derives their roles from server-controlled app metadata. Existing accounts, passwords, and roles are unchanged. Do not rerun the original schema.
+4. In Supabase Authentication settings, disable **Allow new users to sign up**. The Auth admin API still creates accounts. The database guard also rejects ordinary signup attempts.
+5. Log in as an active administrator. Select **Admin → Add user**, enter name and email, choose Job seeker, Company / Employer, or Administrator, and optionally enter an initial password. Company accounts require a company name. A blank password generates a strong one.
+
+New admin-created accounts are active and email-confirmed, without sending signup emails or logging the new user in. The administrator stays signed in. Credentials are shown once in the dialog, masked by default; share them privately. Users can update their initial password under Profile settings. The browser uses its existing session token to call the server; the server independently verifies the caller and checks the current database role. Existing emails return an error without changing their password or role. Failed profile setup triggers deletion of the newly created login; uncertain cleanup is explicitly reported.
+
+For a brand-new project, create the initial administrator with `scripts/provision-admin.cjs` using hidden stdin for the server key, or create an Auth user in the Supabase dashboard **before** applying migration 003 and promote it with the SQL below. The older public-signup helper `scripts/create-account.cjs` is not supported after admin-only mode is enabled.
+
+Validate account creation without production writes using `node --test tests/admin-users.test.mjs tests/vacancies.test.cjs` and `node tests/browser-review.cjs`.
+
 ### New database
 
 1. Create a Supabase project at https://supabase.com/dashboard.
-2. Run `schema.sql` in the Supabase SQL Editor (once, on a new project), followed by `migrations/002-career-portal.sql`.
+2. Run `schema.sql` in the Supabase SQL Editor (once, on a new project), followed by `migrations/002-career-portal.sql`. Follow the admin-only setup above for migration 003.
 3. Copy your Supabase Project URL and **publishable / anon** key into `config.js`.
 4. In Supabase Authentication > URL Configuration, set Site URL to your production Vercel URL and add relevant redirect URLs (`https://YOUR-SITE.vercel.app/**` for redirects).
 5. Publish this folder's **contents as the Vercel project root**. Framework preset: Other; no build command; output directory: default/root. All folders must be committed.
-6. Register the first user, then assign its Admin role using the SQL documented below. Never allow untrusted users to self-elevate roles.
+6. Create the first administrator using the bootstrap steps above. Never allow untrusted users to self-elevate roles.
 
 ## Check a failed database connection
 
@@ -54,7 +68,7 @@ Keep `sb_secret_` keys out of this static site. If a secret key was shared, revo
 
 ## Role pages
 
-- `/` — public job listings and login/signup
+- `/` — public job listings and login; accounts are created by administrators
 - `/admin/` — administrator dashboard
 - `/company/` — employer dashboard
 - `/job-seeker/` — job seeker dashboard
@@ -63,7 +77,7 @@ After login the frontend redirects based on the account role. The role routes ar
 
 ## Initial admin promotion
 
-After signup, use a privileged Supabase SQL Editor session (not browser JavaScript) with the appropriate verified user UUID:
+For an existing Auth user, use a privileged Supabase SQL Editor session (not browser JavaScript) with the appropriate verified user UUID:
 
 ```sql
 update public.profiles
@@ -82,7 +96,7 @@ where id = 'REPLACE_WITH_AUTH_USER_UUID';
 - Edit the vacancy and resource sections in `assets/templates/vacancies.html` and the remaining shared layout in `index.html`. Run `node scripts/sync-pages.cjs` to update all four pages from these templates.
 - Verify with `node --test tests/vacancies.test.cjs` and `node tests/browser-review.cjs`. Browser checks use Chrome on Windows and intercepted Supabase fixtures, without writing production data. Screenshots are saved under ignored `.tmp-ui/`.
 
-- Company signups are pending until approved by an admin.
+- Administrators create active accounts for all three roles. Public signup is removed; the server and migration enforce administrator control.
 - Job postings need approval before appearing publicly.
 - Requirements are stored in a private bucket; application viewers obtain short-lived signed URLs subject to RLS.
 - No real jobs exist until approved companies submit them.

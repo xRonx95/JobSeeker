@@ -47,7 +47,6 @@
     profile = null,
     jobs = [],
     currentView = "home",
-    authMode = "login",
     adminTab = "companies";
   const pageRole = document.body.dataset.portal || "public";
   const rolePaths = {
@@ -99,7 +98,7 @@
   });
   const roleNote = () =>
     !user
-      ? "Please log in or create an account first."
+      ? "Please log in with the account provided by your administrator."
       : !active()
         ? `Your ${esc(profile?.role || "account")} account status is ${esc(profile?.approval_status || "unknown")}. An admin must approve company accounts before posting.`
         : `This area is not available for your ${esc(profile.role)} account.`;
@@ -130,14 +129,13 @@
     renderView().catch(err);
   }
   const gate = (message) =>
-    `<div class="note">${message}</div>${!user ? '<button class="btn" data-auth="login">Log in / Sign up</button>' : ""}`;
+    `<div class="note">${message}</div>${!user ? '<button class="btn" data-auth="login">Log in</button>' : ""}`;
   function redrawNav() {
     const role = profile?.role;
     $("#signedInAs").textContent = user
       ? `${profile?.full_name || user.email} · ${role || "Member"}`
       : "";
     $("#authBtn").classList.toggle("hidden", !!user);
-    $$(".signup-button").forEach(e => e.classList.toggle("hidden", !!user));
     $("#logoutBtn").classList.toggle("hidden", !user);
     $$('[data-view="admin"]').forEach((e) =>
       e.classList.toggle("hidden", !isAdmin()),
@@ -292,30 +290,9 @@
       btn.disabled = false;
     }
   }
-  function showAuth(mode = "login") {
-    authMode = mode;
+  function showAuth() {
     $("#authForm").reset();
-    refreshAuthDialog();
     $("#authDialog").showModal();
-  }
-  function refreshAuthDialog() {
-    const reg = authMode === "register";
-    $("#authTitle").textContent = reg ? "Create your account" : "Log in";
-    $("#authSubtitle").textContent = reg
-      ? "Job seekers are activated immediately. Employers require admin approval."
-      : "Access your personal workspace.";
-    $("#registerFields").classList.toggle("hidden", !reg);
-    $("#authSubmit").textContent = reg ? "Create account" : "Log in";
-    $("#toggleAuth").textContent = reg
-      ? "Already have an account? Log in"
-      : "New here? Create an account";
-    $("#registerName").required = reg;
-    $("#registerCompany").required =
-      reg && $("#roleSelect").value === "company";
-    $("#registerCompanyField").classList.toggle(
-      "hidden",
-      !reg || $("#roleSelect").value !== "company",
-    );
   }
   async function submitAuth(e) {
     e.preventDefault();
@@ -329,48 +306,15 @@
     try {
       const email = f.get("email").trim(),
         password = f.get("password");
-      if (authMode === "register") {
-        const meta = {
-          requested_role: f.get("requested_role"),
-          full_name: f.get("full_name").trim(),
-          company_name: f.get("company_name")?.trim() || "",
-        };
-        const { data, error } = await sb.auth.signUp({
-          email,
-          password,
-          options: {
-            data: meta,
-            emailRedirectTo: location.origin + location.pathname,
-          },
-        });
-        if (error) throw error;
-        $("#authDialog").close();
-        toast(
-          data.session
-            ? "Account created successfully."
-            : "Registration successful. Check your email to verify your account.",
-        );
-        if (data.session) {
-          user = data.user;
-          await loadProfile();
-          await loadJobs();
-          if (enforceRoleRoute()) return;
-          go("dashboard");
-        }
-      } else {
-        const { data, error } = await sb.auth.signInWithPassword({
-          email,
-          password,
-        });
-        if (error) throw error;
-        user = data.user;
-        await loadProfile();
-        $("#authDialog").close();
-        await loadJobs();
-        if (enforceRoleRoute()) return;
-        go("dashboard");
-        toast("Welcome back!");
-      }
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      user = data.user;
+      await loadProfile();
+      $("#authDialog").close();
+      await loadJobs();
+      if (enforceRoleRoute()) return;
+      go("dashboard");
+      toast("Welcome back!");
     } catch (e) {
       err(e);
     } finally {
@@ -678,6 +622,7 @@
     }
     $("#adminContent").innerHTML =
       `<div class="section-head"><h2>Portal administration</h2><button class="btn small" data-manage-resources>Manage fairs, training &amp; advice</button></div><div class="stats-row"><div class="stat-mini"><b>${total}</b><span>Registered users</span></div><div class="stat-mini"><b>${profiles.filter((p) => p.role === "company" && p.approval_status === "pending").length}</b><span>Pending companies</span></div><div class="stat-mini"><b>${allJobs.filter((j) => j.status === "pending").length}</b><span>Jobs awaiting review</span></div><div class="stat-mini"><b>${apps.length}</b><span>Applications *</span></div></div><div class="note">* Dashboard displays the first 500 users/jobs/applications per query. For a larger deployment, add server-side pagination and reporting.</div><div class="panel">${tabs}${content}</div>`;
+    $("#adminContent .section-head").insertAdjacentHTML("beforeend", '<button type="button" class="btn small" data-add-user>+ Add user</button>');
   }
   function statusSelect(p) {
     return p.role === "admin"
@@ -737,6 +682,7 @@
       window.ISABELA_SUPABASE_KEY,
     );
     window.IsabelaPassword.bind(sb);
+    window.IsabelaAdminUsers.bind({ client: sb, isAdmin, refresh: async () => { adminTab = "users"; await admin(); } });
     const { data, error } = await sb.auth.getUser();
     if (error && error.name !== "AuthSessionMissingError") throw error;
     user = data?.user || null;
@@ -774,11 +720,6 @@
     const open = $("#nav").classList.toggle("open");
     $("#menuBtn").setAttribute("aria-expanded", String(open));
   });
-  $("#toggleAuth").addEventListener("click", () => {
-    authMode = authMode === "login" ? "register" : "login";
-    refreshAuthDialog();
-  });
-  $("#roleSelect").addEventListener("change", refreshAuthDialog);
   $("#authForm").addEventListener("submit", submitAuth);
   $("#jobForm").addEventListener("submit", submitJob);
   $("#applyForm").addEventListener("submit", submitApplication);

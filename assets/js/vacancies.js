@@ -131,7 +131,7 @@
       if(x.dataset.jobTitle){resetFilters();$('#searchBox').value=x.dataset.jobTitle;ctx.renderJobs();}
       if(x.hasAttribute('data-reset-jobs'))resetFilters();
       if(x.dataset.article)showArticle(x.dataset.article);
-      if(x.hasAttribute('data-hiring')){if(ctx.isCompany())ctx.go('post');else if(ctx.user())ctx.toast('An approved employer account is required to post a vacancy.','error');else ctx.showAuth('register');}
+      if(x.hasAttribute('data-hiring')){if(ctx.isCompany())ctx.go('post');else if(ctx.user())ctx.toast('An approved employer account is required to post a vacancy.','error');else{ctx.toast('Contact the portal administrator to request an employer account.');ctx.showAuth();}}
       if(x.hasAttribute('data-refresh-resources')){if(ctx.view()==='admin')adminResources();else renderResources(ctx.view());}
       if(x.hasAttribute('data-manage-resources')&&ctx.isAdmin())adminResources();
       if(x.hasAttribute('data-return-admin'))ctx.go('admin');

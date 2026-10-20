@@ -28,6 +28,7 @@
 
     <script defer src="/assets/js/vacancies.js"></script>
     <script defer src="/assets/js/password.js"></script>
+    <script defer src="/assets/js/admin-users.js"></script>
     <!-- Main Application Script -->
     <script defer src="/assets/js/script.js"></script>
   </head>
@@ -49,7 +50,7 @@
   <div class="topbar"><a class="brand" href="/"><span class="brand-icon">IC<span class="brand-spark">✦</span></span><span>ISABELA <strong>CAREERS</strong><small>LOCAL TALENT. REAL OPPORTUNITY.</small></span></a>
   <button id="menuBtn" type="button" class="ghost mobile" aria-label="Toggle navigation" aria-controls="nav" aria-expanded="false">Menu</button>
   <nav id="nav" class="primary-nav" aria-label="Main navigation"><button class="nav-link active" data-view="home">Jobs</button><button class="nav-link" data-view="fairs">Job fairs</button><button class="nav-link" data-view="training">Training</button><button class="nav-link" data-view="advice">Career advice</button><button class="nav-link" data-view="employers">Approved employers</button><button class="nav-link" data-view="dashboard">Dashboard</button><button class="nav-link" data-view="post">Post a job</button><button class="nav-link" data-view="applications">Applications</button><button class="nav-link" data-view="admin">Admin</button><button class="nav-link" data-view="profile">My profile</button></nav>
-  <div class="top-actions"><span id="signedInAs" class="muted"></span><button class="btn small signup-button" data-auth="register">Sign up</button><button id="authBtn" type="button" class="btn small">Log in</button><button id="logoutBtn" type="button" class="btn outline small hidden">Log out</button></div></div>
+  <div class="top-actions"><span id="signedInAs" class="muted"></span><button id="authBtn" type="button" class="btn small">Log in</button><button id="logoutBtn" type="button" class="btn outline small hidden">Log out</button></div></div>
 </header>
 
         <!-- =====================================
@@ -366,42 +367,8 @@
 
         <h2 id="authTitle">Log in</h2>
 
-        <p id="authSubtitle" class="muted">Access your dashboard.</p>
+        <p id="authSubtitle" class="muted">Log in with the account provided by your administrator.</p>
 
-        <!-- Registration Fields -->
-        <div id="registerFields" class="hidden">
-          <label>
-            Register as
-
-            <select name="requested_role" id="roleSelect">
-              <option value="seeker">Job Seeker</option>
-
-              <option value="company">Company / Employer</option>
-            </select>
-          </label>
-
-          <label>
-            Full name *
-
-            <input
-              name="full_name"
-              id="registerName"
-              type="text"
-              maxlength="120"
-            />
-          </label>
-
-          <label id="registerCompanyField" class="hidden">
-            Company name *
-
-            <input
-              name="company_name"
-              id="registerCompany"
-              type="text"
-              maxlength="180"
-            />
-          </label>
-        </div>
 
         <!-- Email -->
         <label>
@@ -425,9 +392,7 @@
 
         <button id="authSubmit" class="btn block" type="submit">Log in</button>
 
-        <button id="toggleAuth" class="text-btn" type="button">
-          New here? Create an account
-        </button>
+        <p class="muted">Need an account? Contact your portal administrator.</p>
         <a href="/reset-password.html" class="text-btn">Forgot your password?</a>
       </form>
     </dialog>
@@ -435,6 +400,32 @@
     <!-- =========================================
          JOB DETAILS MODAL
     ========================================== -->
+    <dialog id="addUserDialog" class="modal" aria-labelledby="addUserHeading">
+      <div class="dialog-body">
+        <button type="button" class="close" data-close="addUserDialog" aria-label="Close add user">×</button>
+        <span class="eyebrow dark">ADMINISTRATION</span>
+        <h2 id="addUserHeading">Add user</h2>
+        <p>Create an active account with the role you choose. You will stay signed in as administrator.</p>
+        <form id="addUserForm">
+          <label>Full name<input name="full_name" required maxlength="120" autocomplete="off" /></label>
+          <label>Email address<input name="email" type="email" required maxlength="254" autocomplete="off" /></label>
+          <label>Account role<select name="role"><option value="seeker">Job seeker</option><option value="company">Company / Employer</option><option value="admin">Administrator</option></select></label>
+          <label id="addUserCompany" class="hidden">Company name<input name="company_name" maxlength="180" disabled /></label>
+          <p id="addUserAdminNotice" class="note hidden">Administrators can create users, approve employers, and manage the portal. Grant this role only to someone you trust.</p>
+          <label>Initial password (optional)<input name="password" type="password" minlength="8" maxlength="128" autocomplete="new-password" /></label>
+          <p class="muted">Leave blank to generate a strong password. This account will not require a confirmation email. Share its login details privately.</p>
+          <button type="submit" class="btn">Create account</button>
+        </form>
+        <p id="addUserStatus" role="status" aria-live="polite"></p>
+        <section id="createdUserDetails" class="hidden" aria-label="New user login details">
+          <label>Email<input id="createdUserEmail" readonly /></label>
+          <label>Initial password<input id="createdUserPassword" type="password" readonly autocomplete="off" /></label>
+          <button id="showCreatedPassword" type="button" class="text-button" aria-pressed="false">Show password</button>
+          <p>Save these details before closing. The password is shown here once. Ask the user to change it in Profile settings after logging in.</p>
+          <button id="addAnotherUser" type="button" class="btn">Add another user</button>
+        </section>
+      </div>
+    </dialog>
     <dialog id="jobDialog" class="modal wide">
       <div class="dialog-body">
         <button

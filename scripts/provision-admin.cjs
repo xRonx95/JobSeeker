@@ -63,6 +63,7 @@ process.stdin.on('data', async chunk => {
       const result = await request('/auth/v1/admin/users', 'POST', {
         email, password, email_confirm: true,
         user_metadata: { full_name: 'Ronnie Mayang', requested_role: 'seeker' },
+        app_metadata: { portal_created_by_admin: true, portal_role: 'admin' },
       });
       account = result.user || result;
     }

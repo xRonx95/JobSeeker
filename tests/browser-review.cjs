@@ -10,7 +10,19 @@ fs.mkdirSync(output,{recursive:true});
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 let chrome,ws,server;
 async function main(){
+  const createdAccounts=[];
   server=http.createServer((req,res)=>{
+    if(req.url==='/api/admin/users'){
+      let input='';req.on('data',chunk=>input+=chunk);req.on('end',()=>{
+        res.setHeader('Content-Type','application/json');
+        if(!req.headers.authorization?.startsWith('Bearer ')){res.writeHead(401).end(JSON.stringify({error:'Login required'}));return;}
+        const body=JSON.parse(input);
+        if(createdAccounts.some(x=>x.email===body.email)){res.writeHead(409).end(JSON.stringify({error:'An account with this email already exists.'}));return;}
+        const user={...body,id:`created-${createdAccounts.length}`,approval_status:'active',created_at:new Date().toISOString()};
+        delete user.password;createdAccounts.push(user);
+        res.writeHead(201).end(JSON.stringify({user,temporary_password:body.password||'Generated-test-password!9',message:'Account created. The new user must log in separately.'}));
+      });return;
+    }
     let file=path.resolve(root,'.'+decodeURIComponent(new URL(req.url,'http://localhost').pathname));
     if(!file.startsWith(root+path.sep)&&file!==root){res.writeHead(403).end();return;}
     if(fs.existsSync(file)&&fs.statSync(file).isDirectory())file=path.join(file,'index.html');
@@ -44,7 +56,7 @@ async function main(){
       if(url.pathname==='/auth/v1/recover'&&request.method==='POST'){resetRequests.push({body:JSON.parse(request.postData),redirect:url.searchParams.get('redirect_to')});data={};}
       if(url.pathname==='/rest/v1/profiles'){
         const profile={id:mockUser.id,email:mockUser.email,full_name:'Review account',company_name:'Review employer',role:mockRole,approval_status:'active'};
-        data=url.searchParams.has('id')?profile:[profile];
+        data=url.searchParams.has('id')?profile:[profile,...createdAccounts];
       }
       if(url.pathname==='/rest/v1/saved_jobs'){
         if(request.method==='POST'){const row=JSON.parse(request.postData);saved=[row];}
@@ -71,6 +83,7 @@ async function main(){
   await send('Page.navigate',{url:base});
   await until("document.querySelectorAll('.vacancy-row').length===10");
   assert.match(await evaluate("document.querySelector('#resultCount').textContent"),/23 job openings/);
+  assert.equal(await evaluate("document.querySelector('.signup-button,#registerFields,#toggleAuth')"),null,'Public signup controls remain');
   await evaluate("document.querySelector('[data-job-page=\"2\"]').click()");
   assert.match(await evaluate("document.querySelector('#jobPagination').textContent"),/Page 2 of 3/);
   await evaluate("document.querySelector('[data-audience=\"pwd\"]').click()");
@@ -110,6 +123,30 @@ async function main(){
   await send('Emulation.setDeviceMetricsOverride',{width:1365,height:1000,deviceScaleFactor:1,mobile:false});
   await send('Page.navigate',{url:base+'/admin/'});
   await until("document.querySelector('[data-manage-resources]')!==null");
+  const sessionBefore=await evaluate("localStorage.getItem('sb-hderthposugfbijwvvjm-auth-token')");
+  for(const role of ['seeker','company','admin']){
+    await evaluate("document.querySelector('[data-add-user]').click()");
+    assert.equal(await evaluate("document.querySelector('#addUserDialog').open"),true);
+    await evaluate(`{const f=document.querySelector('#addUserForm');f.elements.full_name.value='QA ${role}';f.elements.email.value='qa-${role}@example.test';f.elements.role.value='${role}';f.elements.role.dispatchEvent(new Event('change'));}`);
+    assert.equal(await evaluate("document.querySelector('#addUserForm').elements.company_name.required"),role==='company');
+    assert.equal(await evaluate("document.querySelector('#addUserAdminNotice').classList.contains('hidden')"),role!=='admin');
+    if(role==='company')await evaluate("document.querySelector('#addUserForm').elements.company_name.value='QA Company'");
+    if(role==='admin'){
+      const adminShot=await send('Page.captureScreenshot',{format:'png'});
+      fs.writeFileSync(path.join(output,'admin-add-user.png'),Buffer.from(adminShot.data,'base64'));
+    }
+    await evaluate("document.querySelector('#addUserForm').requestSubmit()");
+    await until("!document.querySelector('#createdUserDetails').classList.contains('hidden')");
+    assert.equal(await evaluate("document.querySelector('#createdUserPassword').type"),'password');
+    assert.equal(await evaluate("localStorage.getItem('sb-hderthposugfbijwvvjm-auth-token')"),sessionBefore,'Creating a user replaced the admin session');
+    await evaluate("document.querySelector('#addUserDialog').close()");
+    await until("document.querySelector('#createdUserPassword').value===''");
+  }
+  assert.deepEqual(createdAccounts.map(x=>x.role),['seeker','company','admin']);
+  await evaluate("document.querySelector('[data-add-user]').click();{const f=document.querySelector('#addUserForm');f.elements.full_name.value='Duplicate';f.elements.email.value='qa-seeker@example.test';f.requestSubmit();}");
+  await until("document.querySelector('#addUserStatus').textContent.includes('already exists')");
+  assert.equal(createdAccounts.length,3);
+  await evaluate("document.querySelector('#addUserDialog').close()");
   await evaluate("document.querySelector('[data-manage-resources]').click()");
   await until("document.querySelector('#resourceEditor')!==null");
   await evaluate("{const f=document.querySelector('#resourceEditor');f.elements.kind.value='advice';f.elements.title.value='Test career article';f.elements.description.value='An article summary';f.elements.body.value='Practical career advice';f.elements.published.checked=true;f.requestSubmit();}");
@@ -122,6 +159,7 @@ async function main(){
   mockRole='seeker';
   await send('Page.navigate',{url:base+'/job-seeker/'});
   await until("document.querySelector('#welcome')?.textContent.includes('Review account')");
+  assert.equal(await evaluate("document.querySelector('[data-add-user]')"),null,'Seeker sees admin create button');
   await evaluate("document.querySelector('[data-view=\"home\"]').click();document.querySelector('.save-job').click()");
   await until("document.querySelector('.save-job')?.getAttribute('aria-pressed')==='true'");
   assert.equal(saved.length,1);
@@ -161,7 +199,7 @@ async function main(){
   await until("document.querySelector('#passwordDone')&&!document.querySelector('#passwordDone').classList.contains('hidden')");
   assert.equal(passwordUpdates,2);
   assert.deepEqual(errors,[],'Browser runtime exceptions');
-  console.log('Browser checks passed: portal regression checks, profile password mismatch/update, reset email request/redirect, signed-out recovery request, and recovery-link password update.');
+  console.log('Browser checks passed: admin creates all three roles without switching sessions, duplicate email errors, password cleanup, public signup removal, and existing portal/password regression checks.');
   console.log('Screenshots: .tmp-ui/vacancies-desktop.png and .tmp-ui/vacancies-mobile.png');
   await send('Browser.close').catch(()=>{});
 }
