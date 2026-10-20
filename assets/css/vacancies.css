@@ -1,4 +1,10 @@
 /* Compact vacancy directory, inspired by the supplied job portal reference. */
+.password-recovery {max-width:550px;margin:60px auto;padding:0 20px;}
+.password-recovery>.panel {margin-top:24px;}
+#passwordPanel {margin-top:24px;}
+#passwordPanel hr {border:0;border-top:1px solid var(--line);margin:24px 0;}
+.password-error {color:#ad3543;}
+.password-feedback {color:#227249;}
 :root { --teal:#249bc2; --teal-dark:#177da0; --teal-light:#eef8fb; --ink:#41464b; --heading:#25292d; --muted:#7b8086; --bg:#fff; --line:#eceef0; }
 body { background:#fff; font-size:13px; }
 h1,h2,h3 {font-family:"DM Sans",Arial,sans-serif;font-weight:600;letter-spacing:-.5px;}

@@ -482,6 +482,7 @@
     }
   }
   async function profilePage() {
+    $("#passwordPanel").classList.toggle("hidden", !user);
     $("#profileGate").innerHTML = user
       ? !active()
         ? gate(roleNote())
@@ -735,6 +736,7 @@
       window.ISABELA_SUPABASE_URL,
       window.ISABELA_SUPABASE_KEY,
     );
+    window.IsabelaPassword.bind(sb);
     const { data, error } = await sb.auth.getUser();
     if (error && error.name !== "AuthSessionMissingError") throw error;
     user = data?.user || null;

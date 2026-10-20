@@ -29,7 +29,7 @@ async function main(){
   ws=new WebSocket(tabs.find(x=>x.type==='page').webSocketDebuggerUrl);
   await new Promise((resolve,reject)=>{ws.onopen=resolve;ws.onerror=reject;});
   let seq=0;const pending=new Map(),errors=[];
-  let mockRole='admin', saved=[], content=[];
+  let mockRole='admin', saved=[], content=[], passwordUpdates=0, resetRequests=[];
   const mockUser={id:'00000000-0000-4000-8000-000000000001',email:'review@example.test',app_metadata:{provider:'email'},user_metadata:{},aud:'authenticated',created_at:'2026-01-01T00:00:00Z'};
   function send(method,params={}){return new Promise((resolve,reject)=>{const id=++seq;pending.set(id,{resolve,reject});ws.send(JSON.stringify({id,method,params}));});}
   const jobs=Array.from({length:23},(_,i)=>({id:`job-${i}`,company_id:i%2?'b':'a',title:i%2?'Office Assistant':'Software Developer',company_name:i%2?'Basilan Community Services':'Isabela Technology Group',location:'Isabela City, Basilan',category:i%2?'Administration':'Information Technology',employment_type:'Full-time',description:'An opportunity to grow your career in the local community.',qualifications:'Communication and teamwork skills.',requirements:['Resume'],audiences:i%2?['pwd','high-school']:[],salary:i%2?'₱18,000–₱22,000 / month':null,status:'approved',created_at:new Date(Date.UTC(2026,9,20-i)).toISOString()}));
@@ -40,6 +40,8 @@ async function main(){
     if(m.method==='Fetch.requestPaused'){
       const {request,requestId}=m.params;const url=new URL(request.url);let data=[];
       if(url.pathname==='/auth/v1/user')data=mockUser;
+      if(url.pathname==='/auth/v1/user'&&request.method==='PUT')passwordUpdates++;
+      if(url.pathname==='/auth/v1/recover'&&request.method==='POST'){resetRequests.push({body:JSON.parse(request.postData),redirect:url.searchParams.get('redirect_to')});data={};}
       if(url.pathname==='/rest/v1/profiles'){
         const profile={id:mockUser.id,email:mockUser.email,full_name:'Review account',company_name:'Review employer',role:mockRole,approval_status:'active'};
         data=url.searchParams.has('id')?profile:[profile];
@@ -58,7 +60,7 @@ async function main(){
         if(request.method==='DELETE')content=content.filter(r=>r.id!==url.searchParams.get('id')?.replace('eq.',''));
         data=kind==='fair'?[{id:'fair-1',kind:'fair',title:'Community career fair',description:'Meet local employers.',body:'Bring your résumé and meet employers.',location:'Isabela City',starts_at:'2026-12-20T01:00:00Z',published:true}]:content.filter(r=>!kind||r.kind===kind);
       }
-      await send('Fetch.fulfillRequest',{requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'application/json'},{name:'Access-Control-Allow-Origin',value:base},{name:'Access-Control-Allow-Methods',value:'GET, POST, PATCH, DELETE, OPTIONS'},{name:'Access-Control-Allow-Headers',value:'authorization, apikey, content-type, x-client-info, prefer, accept, accept-profile, content-profile, x-supabase-api-version'}],body:Buffer.from(JSON.stringify(data)).toString('base64')});
+      await send('Fetch.fulfillRequest',{requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'application/json'},{name:'Access-Control-Allow-Origin',value:base},{name:'Access-Control-Allow-Methods',value:'GET, POST, PUT, PATCH, DELETE, OPTIONS'},{name:'Access-Control-Allow-Headers',value:'authorization, apikey, content-type, x-client-info, prefer, accept, accept-profile, content-profile, x-supabase-api-version'}],body:Buffer.from(JSON.stringify(data)).toString('base64')});
     }
   };
   await send('Runtime.enable');await send('Page.enable');
@@ -104,7 +106,7 @@ async function main(){
   // A synthetic session exercises authenticated UI paths; all requests remain intercepted.
   const payload=Buffer.from(JSON.stringify({sub:mockUser.id,exp:Math.floor(Date.now()/1000)+3600,role:'authenticated',aud:'authenticated'})).toString('base64url');
   const session={access_token:`eyJhbGciOiJIUzI1NiJ9.${payload}.review`,refresh_token:'review-only',token_type:'bearer',expires_in:3600,expires_at:Math.floor(Date.now()/1000)+3600,user:mockUser};
-  await send('Page.addScriptToEvaluateOnNewDocument',{source:`localStorage.setItem('sb-hderthposugfbijwvvjm-auth-token',${JSON.stringify(JSON.stringify(session))});`});
+  const authScript = await send('Page.addScriptToEvaluateOnNewDocument',{source:`localStorage.setItem('sb-hderthposugfbijwvvjm-auth-token',${JSON.stringify(JSON.stringify(session))});`});
   await send('Emulation.setDeviceMetricsOverride',{width:1365,height:1000,deviceScaleFactor:1,mobile:false});
   await send('Page.navigate',{url:base+'/admin/'});
   await until("document.querySelector('[data-manage-resources]')!==null");
@@ -132,8 +134,34 @@ async function main(){
   assert.equal(await evaluate("document.querySelector('#applyDialog').open"),true);
   await evaluate("document.querySelector('#applyDialog').close();document.querySelector('.save-job').click()");
   await until("document.querySelector('.save-job')?.getAttribute('aria-pressed')==='false'");
+  await evaluate("document.querySelector('[data-view=\"profile\"]').click()");
+  assert.equal(await evaluate("document.querySelector('#passwordPanel').classList.contains('hidden')"),false);
+  await evaluate("{const f=document.querySelector('#passwordForm');f.elements.new_password.value='Review-only-password1!';f.elements.confirm_password.value='Different-password1!';f.requestSubmit();}");
+  assert.match(await evaluate("document.querySelector('#passwordStatus').textContent"),/do not match/);
+  assert.equal(passwordUpdates,0,'Mismatched passwords reached the API');
+  await evaluate("{const f=document.querySelector('#passwordForm');f.elements.confirm_password.value=f.elements.new_password.value;f.requestSubmit();}");
+  await until("document.querySelector('#passwordStatus').textContent.includes('has been updated')");
+  assert.equal(passwordUpdates,1);
+  assert.equal(await evaluate("document.querySelector('#passwordForm').elements.new_password.value"),'');
+  await evaluate("document.querySelector('#sendPasswordReset').click()");
+  await until("document.querySelector('#passwordStatus').textContent.includes('reset link has been requested')");
+  assert.equal(resetRequests[0].body.email,mockUser.email);
+  assert.equal(resetRequests[0].redirect,base+'/reset-password.html');
+  await send('Page.removeScriptToEvaluateOnNewDocument',{identifier:authScript.identifier});
+  await evaluate('localStorage.clear()');
+  await send('Page.navigate',{url:base+'/reset-password.html'});
+  await until("document.querySelector('#requestResetForm')&&!document.querySelector('#requestResetForm').classList.contains('hidden')");
+  assert.equal(await evaluate("document.querySelector('#passwordForm').classList.contains('hidden')"),true);
+  await evaluate("{const f=document.querySelector('#requestResetForm');f.elements.email.value='review@example.test';f.requestSubmit();}");
+  await until("document.querySelector('#passwordStatus').textContent.includes('reset link has been requested')");
+  await send('Page.navigate',{url:'about:blank'});
+  await send('Page.navigate',{url:base+'/reset-password.html#access_token='+session.access_token+'&refresh_token=review-only&type=recovery&token_type=bearer&expires_in=3600'});
+  await until("document.querySelector('#passwordForm')&&!document.querySelector('#passwordForm').classList.contains('hidden')");
+  await evaluate("{const f=document.querySelector('#passwordForm');f.elements.new_password.value='Recovery-only-password1!';f.elements.confirm_password.value=f.elements.new_password.value;f.requestSubmit();}");
+  await until("document.querySelector('#passwordDone')&&!document.querySelector('#passwordDone').classList.contains('hidden')");
+  assert.equal(passwordUpdates,2);
   assert.deepEqual(errors,[],'Browser runtime exceptions');
-  console.log('Browser checks passed: public directory, filters, pagination, details, resources, mobile layout/menu, admin content create/edit/delete, saved-job persistence/removal, and selected application job.');
+  console.log('Browser checks passed: portal regression checks, profile password mismatch/update, reset email request/redirect, signed-out recovery request, and recovery-link password update.');
   console.log('Screenshots: .tmp-ui/vacancies-desktop.png and .tmp-ui/vacancies-mobile.png');
   await send('Browser.close').catch(()=>{});
 }

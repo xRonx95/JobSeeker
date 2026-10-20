@@ -73,6 +73,8 @@ where id = 'REPLACE_WITH_AUTH_USER_UUID';
 
 ## Notes
 
+- **Password reset:** Profile settings lets signed-in users update their password or request a reset email. The login dialog also links to `/reset-password.html`. Add `https://jobseeker-neon.vercel.app/reset-password.html` (and any custom-domain equivalent) to Supabase Authentication > URL Configuration > Redirect URLs. Recovery email delivery requires available Supabase email quota or configured SMTP. Direct signed-in password updates do not send email. Supabase controls password strength, session requirements, and any reauthentication policy. See the [Supabase password reset documentation](https://supabase.com/docs/reference/javascript/auth-resetpasswordforemail).
+
 - The vacancy directory includes keyword/location/category/type filters, explicit opportunity groups, sorting, ten results per page, saved jobs, and top openings derived from approved listings. Selected opportunity groups match any selected group; all other filters combine.
 - Employers set opportunity groups on their vacancy form; untagged listings do not claim eligibility. Existing listings remain untagged until updated by a database administrator or replaced through the employer posting flow.
 - Saved jobs persist per signed-in user in Supabase. Private application documents remain separate from public career content.
