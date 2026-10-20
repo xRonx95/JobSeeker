@@ -1,4 +1,11 @@
-// Supabase Project Settings > API keys. ONLY the public publishable / anon key goes here.
-// NEVER put service_role / secret keys in browser JavaScript.
-window.ISABELA_SUPABASE_URL = "https://YOUR-PROJECT.supabase.co";
-window.ISABELA_SUPABASE_KEY = "YOUR_SUPABASE_PUBLISHABLE_OR_ANON_KEY";
+
+"use strict";
+
+// Isabela Careers - Supabase Configuration
+// Public browser configuration only.
+
+window.ISABELA_SUPABASE_URL =
+  "https://hderthposugfbjiwwvjm.supabase.co";
+
+window.ISABELA_SUPABASE_KEY =
+  "sb_publishable_5TMToDJel8DYgokkgekUuA_01COtXBl";
