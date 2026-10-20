@@ -9,7 +9,9 @@ async function main() {
   const { ISABELA_SUPABASE_URL: url, ISABELA_SUPABASE_KEY: key } = context.window;
   if (!key?.startsWith('sb_publishable_') && !key?.startsWith('eyJ'))
     throw new Error('Use a publishable / anon key in config.js. Secret keys are not allowed.');
-  for (const endpoint of ['/auth/v1/settings', '/rest/v1/jobs?select=id&status=eq.approved&limit=1']) {
+  const endpoints = ['/auth/v1/settings', '/rest/v1/jobs?select=id&status=eq.approved&limit=1'];
+  if (process.argv.includes('--features')) endpoints.push('/rest/v1/jobs?select=audiences&limit=1', '/rest/v1/career_resources?select=id&limit=1', '/rest/v1/rpc/list_approved_employers');
+  for (const endpoint of endpoints) {
     const response = await fetch(new URL(endpoint, url), {
       headers: { apikey: key },
       signal: AbortSignal.timeout(15000),

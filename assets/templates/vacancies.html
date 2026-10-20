@@ -1,0 +1,33 @@
+<section id="home" class="view active">
+  <div class="vacancy-heading"><div><p class="breadcrumb">Home <span>/</span> Jobs</p><h1>Job vacancies<span class="heading-dot">.</span></h1><p>Your next opportunity starts here. Find work in Isabela City and beyond.</p></div><span class="local-badge">ISABELA CITY · BASILAN</span></div>
+  <div class="vacancy-layout">
+    <div class="vacancy-main">
+      <section class="vacancy-search" aria-labelledby="findJobsHeading">
+        <h2 id="findJobsHeading">Find a job here</h2><p>Search by position, skill, company, or location.</p>
+        <form id="heroSearch" role="search" class="vacancy-search-form">
+          <label><span class="sr-only">Job title, keyword, or company</span><input id="searchBox" type="search" placeholder="Job title, keyword, or company" /></label>
+          <label><span class="sr-only">City or location</span><input id="locationSearch" type="search" placeholder="City or location" /></label>
+          <button type="submit" class="btn">Search</button>
+        </form>
+        <div class="audience-filters"><span>Opportunities for</span><label><input type="checkbox" data-audience="pwd" /> Persons with disabilities</label><label><input type="checkbox" data-audience="overseas" /> Overseas workers</label><label><input type="checkbox" data-audience="high-school" /> High school graduates</label><label><input type="checkbox" data-audience="government" /> Government jobs</label></div>
+      </section>
+      <section id="jobsArea" aria-label="Job vacancies">
+        <div class="vacancy-toolbar"><p id="resultCount" role="status" aria-live="polite">Loading vacancies…</p><div><button type="button" class="text-button" id="clearFilters">Reset filters</button><label><span class="sr-only">Sort vacancies</span><select id="sortJobs"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="title">Job title A–Z</option><option value="company">Company A–Z</option></select></label></div></div>
+        <div class="filters vacancy-selects"><select id="categoryFilter" aria-label="Filter by category"><option value="">All categories</option><option>Administration</option><option>Education</option><option>Information Technology</option><option>Healthcare</option><option>Retail &amp; Sales</option><option>Hospitality</option><option>Construction</option><option>Other</option></select><select id="typeFilter" aria-label="Filter by employment type"><option value="">All employment types</option><option>Full-time</option><option>Part-time</option><option>Contract</option><option>Internship</option><option>Remote</option></select><label class="saved-filter"><input type="checkbox" id="savedOnly" /> Saved jobs</label></div>
+        <div id="jobGrid" class="job-grid"><p class="empty">Loading jobs…</p></div><div id="jobPagination" class="pagination" aria-label="Vacancy pages"></div>
+      </section>
+    </div>
+    <aside class="vacancy-sidebar" aria-label="Job seeker resources">
+      <section class="sidebar-section"><span class="section-kicker">EXPLORE OPPORTUNITIES</span><h2>Top job openings</h2><div id="topOpenings"><p>Loading openings…</p></div></section>
+      <section class="sidebar-section"><h2>Career advice</h2><button class="advice-tile interview-tile" data-article="interview"><span class="tile-illustration" aria-hidden="true">↗</span><span class="section-kicker">MAKE YOUR NEXT MOVE</span><strong>Walk into your next<br>interview with confidence.</strong><span>Read the interview guide →</span></button><button class="advice-tile resume-tile" data-article="resume"><span class="section-kicker">A STRONG FIRST IMPRESSION</span><strong>A better résumé.<br>A brighter beginning.</strong><span>Build your application checklist →</span></button></section>
+      <section class="employer-callout"><span class="section-kicker">FOR EMPLOYERS</span><h2>Great people.<br>Right here.</h2><p>Find your next team member in our community.</p><button class="btn" data-hiring>Post a vacancy →</button></section>
+      <section class="sidebar-section"><h2>Our community, in numbers</h2><div class="compact-metrics"><div><strong id="totalJobs">—</strong><span>Open vacancies</span></div><div><strong id="totalCompanies">—</strong><span>Companies hiring</span></div><div><strong id="myApplicationCount">—</strong><span>Your applications</span></div></div></section>
+      <p class="safety-note">Apply with confidence. Verify employer details and never pay to apply for a job.</p>
+    </aside>
+  </div>
+</section>
+<section id="fairs" class="view"><div class="page-title"><p class="breadcrumb">Home / Job fairs</p><h1>Meet your next employer.</h1><p>Upcoming job fairs and recruitment events published by our administrators.</p></div><div id="fairsContent" class="resource-grid"></div></section>
+<section id="training" class="view"><div class="page-title"><p class="breadcrumb">Home / Training</p><h1>Build skills. Open doors.</h1><p>Discover training programs, workshops, and learning opportunities.</p></div><div id="trainingContent" class="resource-grid"></div></section>
+<section id="advice" class="view"><div class="page-title"><p class="breadcrumb">Home / Career advice</p><h1>A little guidance. A big next step.</h1><p>Practical advice for your job search, applications, and interviews.</p></div><div id="adviceContent" class="resource-grid"></div></section>
+<section id="employers" class="view"><div class="page-title"><p class="breadcrumb">Home / Approved employers</p><h1>Find your next team.</h1><p>Employers approved by Isabela Careers. Approval is portal moderation, not government accreditation.</p></div><label class="directory-search">Search employers<input id="employerSearch" type="search" placeholder="Company name or location" /></label><div id="employersContent" class="resource-grid"></div></section>
+<dialog id="resourceDialog" class="modal"><div class="dialog-body"><button class="modal-close" data-close="resourceDialog" aria-label="Close details">×</button><div id="resourceDetail"></div></div></dialog>

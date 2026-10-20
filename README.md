@@ -23,8 +23,17 @@ isabela-careers-role-folders/
 
 ## Setup
 
+### Upgrade the existing portal
+
+1. Open the existing project's Supabase SQL Editor and run [migrations/002-career-portal.sql](migrations/002-career-portal.sql). It adds opportunity groups, saved jobs, career content, a public employer directory RPC, and the document attachment fix. It is safe to rerun. Do not rerun `schema.sql` on an existing database.
+2. Run `node scripts/check-connection.cjs --features` to check the new public endpoints.
+3. Redeploy the updated root folder to the existing Vercel project.
+4. Sign in as an administrator and choose **Manage fairs, training & advice** to create, edit, publish, or delete content. Event times use Philippine time. No invented employers or events are inserted.
+
+### New database
+
 1. Create a Supabase project at https://supabase.com/dashboard.
-2. Run `schema.sql` in the Supabase SQL Editor (once, on a new project).
+2. Run `schema.sql` in the Supabase SQL Editor (once, on a new project), followed by `migrations/002-career-portal.sql`.
 3. Copy your Supabase Project URL and **publishable / anon** key into `config.js`.
 4. In Supabase Authentication > URL Configuration, set Site URL to your production Vercel URL and add relevant redirect URLs (`https://YOUR-SITE.vercel.app/**` for redirects).
 5. Publish this folder's **contents as the Vercel project root**. Framework preset: Other; no build command; output directory: default/root. All folders must be committed.
@@ -63,6 +72,13 @@ where id = 'REPLACE_WITH_AUTH_USER_UUID';
 ```
 
 ## Notes
+
+- The vacancy directory includes keyword/location/category/type filters, explicit opportunity groups, sorting, ten results per page, saved jobs, and top openings derived from approved listings. Selected opportunity groups match any selected group; all other filters combine.
+- Employers set opportunity groups on their vacancy form; untagged listings do not claim eligibility. Existing listings remain untagged until updated by a database administrator or replaced through the employer posting flow.
+- Saved jobs persist per signed-in user in Supabase. Private application documents remain separate from public career content.
+- Job fairs and training show future published events. Three built-in career guides remain available before the migration. The approved-employer directory exposes business names, location, bio, and opening counts; it excludes contact details and does not claim government accreditation.
+- Edit the vacancy and resource sections in `assets/templates/vacancies.html` and the remaining shared layout in `index.html`. Run `node scripts/sync-pages.cjs` to update all four pages from these templates.
+- Verify with `node --test tests/vacancies.test.cjs` and `node tests/browser-review.cjs`. Browser checks use Chrome on Windows and intercepted Supabase fixtures, without writing production data. Screenshots are saved under ignored `.tmp-ui/`.
 
 - Company signups are pending until approved by an admin.
 - Job postings need approval before appearing publicly.

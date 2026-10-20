@@ -15,6 +15,7 @@
 
     <!-- Stylesheet -->
     <link rel="stylesheet" href="/assets/css/style.css" />
+    <link rel="stylesheet" href="/assets/css/vacancies.css" />
 
     <!-- Supabase Configuration -->
     <script src="/config.js"></script>
@@ -25,6 +26,7 @@
       src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"
     ></script>
 
+    <script defer src="/assets/js/vacancies.js"></script>
     <!-- Main Application Script -->
     <script defer src="/assets/js/script.js"></script>
   </head>
@@ -42,76 +44,12 @@
         <!-- =====================================
                  TOP NAVIGATION BAR
             ====================================== -->
-        <header class="site-header">
-          <div class="topbar">
-            <a class="brand" href="/">
-              <span class="brand-icon">IC</span>
-
-              <span>
-                ISABELA <strong>CAREERS</strong>
-                <small>ISABELA CITY · BASILAN</small>
-              </span>
-            </a>
-
-            <button
-              id="menuBtn"
-              type="button"
-              class="ghost mobile"
-              aria-label="Toggle navigation"
-              aria-controls="nav"
-              aria-expanded="false"
-            >
-              Menu
-            </button>
-
-            <span class="top-heading">
-              Community Employment Portal
-              <span class="dot">●</span>
-              Isabela City, Basilan
-            </span>
-
-            <div class="top-actions">
-              <span id="signedInAs" class="muted"></span>
-
-              <button id="authBtn" type="button" class="btn small">
-                Log in / Sign up
-              </button>
-
-              <button
-                id="logoutBtn"
-                type="button"
-                class="btn outline small hidden"
-              >
-                Log out
-              </button>
-            </div>
-          </div>
-          <nav id="nav" class="primary-nav" aria-label="Main navigation">
-            <button type="button" class="nav-link active" data-view="home">
-              Explore jobs
-            </button>
-
-            <button type="button" class="nav-link" data-view="dashboard">
-              My dashboard
-            </button>
-
-            <button type="button" class="nav-link" data-view="post">
-              Post a job
-            </button>
-
-            <button type="button" class="nav-link" data-view="applications">
-              Applications
-            </button>
-
-            <button type="button" class="nav-link" data-view="admin">
-              Administration
-            </button>
-
-            <button type="button" class="nav-link" data-view="profile">
-              My profile
-            </button>
-          </nav>
-        </header>
+        <header class="site-header vacancy-header">
+  <div class="topbar"><a class="brand" href="/"><span class="brand-icon">IC<span class="brand-spark">✦</span></span><span>ISABELA <strong>CAREERS</strong><small>LOCAL TALENT. REAL OPPORTUNITY.</small></span></a>
+  <button id="menuBtn" type="button" class="ghost mobile" aria-label="Toggle navigation" aria-controls="nav" aria-expanded="false">Menu</button>
+  <nav id="nav" class="primary-nav" aria-label="Main navigation"><button class="nav-link active" data-view="home">Jobs</button><button class="nav-link" data-view="fairs">Job fairs</button><button class="nav-link" data-view="training">Training</button><button class="nav-link" data-view="advice">Career advice</button><button class="nav-link" data-view="employers">Approved employers</button><button class="nav-link" data-view="dashboard">Dashboard</button><button class="nav-link" data-view="post">Post a job</button><button class="nav-link" data-view="applications">Applications</button><button class="nav-link" data-view="admin">Admin</button><button class="nav-link" data-view="profile">My profile</button></nav>
+  <div class="top-actions"><span id="signedInAs" class="muted"></span><button class="btn small signup-button" data-auth="register">Sign up</button><button id="authBtn" type="button" class="btn small">Log in</button><button id="logoutBtn" type="button" class="btn outline small hidden">Log out</button></div></div>
+</header>
 
         <!-- =====================================
                  PAGE CONTENT
@@ -121,136 +59,40 @@
                      HOME / EXPLORE JOBS
                 ================================= -->
           <section id="home" class="view active">
-            <!-- Hero Section -->
-            <div class="hero">
-              <div class="hero-search-panel">
-                <span class="eyebrow">LOCAL TALENT. LOCAL OPPORTUNITY.</span>
-                <h1>Find the job that fits your life.</h1>
-                <p>
-                  Discover your next opportunity in Isabela City and across
-                  Basilan.
-                </p>
-                <form id="heroSearch" class="hero-search" role="search">
-                  <label class="search-keyword"
-                    ><span class="sr-only">Job title, keyword, or company</span
-                    ><input
-                      id="searchBox"
-                      type="search"
-                      placeholder="Job title, keyword, or company"
-                  /></label>
-                  <label class="search-location"
-                    ><span class="sr-only">Location</span
-                    ><input
-                      id="locationSearch"
-                      type="search"
-                      placeholder="City or location"
-                      value="Isabela City"
-                  /></label>
-                  <button
-                    type="submit"
-                    class="btn search-submit"
-                    aria-label="Search jobs"
-                  >
-                    <svg
-                      viewBox="0 0 24 24"
-                      width="22"
-                      height="22"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      aria-hidden="true"
-                    >
-                      <circle cx="10.5" cy="10.5" r="6.5" />
-                      <path d="m16 16 5 5" /></svg
-                    ><span>Search jobs</span>
-                  </button>
-                </form>
-              </div>
-              <div class="hiring-callout">
-                <h2>Are you hiring?</h2>
-                <p>Connect with talent in your community.</p>
-                <button type="button" class="btn" data-auth="register">
-                  Post a job
-                </button>
-              </div>
-            </div>
-            <div class="opportunity-strip">
-              <span>YOUR NEXT CHAPTER</span>
-              <p>
-                Local opportunities. Meaningful careers.
-                <button type="button" data-goto="jobsArea">
-                  Explore openings <span aria-hidden="true">&rarr;</span>
-                </button>
-              </p>
-            </div>
-            <!-- Dashboard Metrics -->
-            <div class="metrics">
-              <div class="metric">
-                <span>AVAILABLE JOBS</span>
-                <strong id="totalJobs">—</strong>
-                <small>Approved listings</small>
-              </div>
+  <div class="vacancy-heading"><div><p class="breadcrumb">Home <span>/</span> Jobs</p><h1>Job vacancies<span class="heading-dot">.</span></h1><p>Your next opportunity starts here. Find work in Isabela City and beyond.</p></div><span class="local-badge">ISABELA CITY · BASILAN</span></div>
+  <div class="vacancy-layout">
+    <div class="vacancy-main">
+      <section class="vacancy-search" aria-labelledby="findJobsHeading">
+        <h2 id="findJobsHeading">Find a job here</h2><p>Search by position, skill, company, or location.</p>
+        <form id="heroSearch" role="search" class="vacancy-search-form">
+          <label><span class="sr-only">Job title, keyword, or company</span><input id="searchBox" type="search" placeholder="Job title, keyword, or company" /></label>
+          <label><span class="sr-only">City or location</span><input id="locationSearch" type="search" placeholder="City or location" /></label>
+          <button type="submit" class="btn">Search</button>
+        </form>
+        <div class="audience-filters"><span>Opportunities for</span><label><input type="checkbox" data-audience="pwd" /> Persons with disabilities</label><label><input type="checkbox" data-audience="overseas" /> Overseas workers</label><label><input type="checkbox" data-audience="high-school" /> High school graduates</label><label><input type="checkbox" data-audience="government" /> Government jobs</label></div>
+      </section>
+      <section id="jobsArea" aria-label="Job vacancies">
+        <div class="vacancy-toolbar"><p id="resultCount" role="status" aria-live="polite">Loading vacancies…</p><div><button type="button" class="text-button" id="clearFilters">Reset filters</button><label><span class="sr-only">Sort vacancies</span><select id="sortJobs"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="title">Job title A–Z</option><option value="company">Company A–Z</option></select></label></div></div>
+        <div class="filters vacancy-selects"><select id="categoryFilter" aria-label="Filter by category"><option value="">All categories</option><option>Administration</option><option>Education</option><option>Information Technology</option><option>Healthcare</option><option>Retail &amp; Sales</option><option>Hospitality</option><option>Construction</option><option>Other</option></select><select id="typeFilter" aria-label="Filter by employment type"><option value="">All employment types</option><option>Full-time</option><option>Part-time</option><option>Contract</option><option>Internship</option><option>Remote</option></select><label class="saved-filter"><input type="checkbox" id="savedOnly" /> Saved jobs</label></div>
+        <div id="jobGrid" class="job-grid"><p class="empty">Loading jobs…</p></div><div id="jobPagination" class="pagination" aria-label="Vacancy pages"></div>
+      </section>
+    </div>
+    <aside class="vacancy-sidebar" aria-label="Job seeker resources">
+      <section class="sidebar-section"><span class="section-kicker">EXPLORE OPPORTUNITIES</span><h2>Top job openings</h2><div id="topOpenings"><p>Loading openings…</p></div></section>
+      <section class="sidebar-section"><h2>Career advice</h2><button class="advice-tile interview-tile" data-article="interview"><span class="tile-illustration" aria-hidden="true">↗</span><span class="section-kicker">MAKE YOUR NEXT MOVE</span><strong>Walk into your next<br>interview with confidence.</strong><span>Read the interview guide →</span></button><button class="advice-tile resume-tile" data-article="resume"><span class="section-kicker">A STRONG FIRST IMPRESSION</span><strong>A better résumé.<br>A brighter beginning.</strong><span>Build your application checklist →</span></button></section>
+      <section class="employer-callout"><span class="section-kicker">FOR EMPLOYERS</span><h2>Great people.<br>Right here.</h2><p>Find your next team member in our community.</p><button class="btn" data-hiring>Post a vacancy →</button></section>
+      <section class="sidebar-section"><h2>Our community, in numbers</h2><div class="compact-metrics"><div><strong id="totalJobs">—</strong><span>Open vacancies</span></div><div><strong id="totalCompanies">—</strong><span>Companies hiring</span></div><div><strong id="myApplicationCount">—</strong><span>Your applications</span></div></div></section>
+      <p class="safety-note">Apply with confidence. Verify employer details and never pay to apply for a job.</p>
+    </aside>
+  </div>
+</section>
+<section id="fairs" class="view"><div class="page-title"><p class="breadcrumb">Home / Job fairs</p><h1>Meet your next employer.</h1><p>Upcoming job fairs and recruitment events published by our administrators.</p></div><div id="fairsContent" class="resource-grid"></div></section>
+<section id="training" class="view"><div class="page-title"><p class="breadcrumb">Home / Training</p><h1>Build skills. Open doors.</h1><p>Discover training programs, workshops, and learning opportunities.</p></div><div id="trainingContent" class="resource-grid"></div></section>
+<section id="advice" class="view"><div class="page-title"><p class="breadcrumb">Home / Career advice</p><h1>A little guidance. A big next step.</h1><p>Practical advice for your job search, applications, and interviews.</p></div><div id="adviceContent" class="resource-grid"></div></section>
+<section id="employers" class="view"><div class="page-title"><p class="breadcrumb">Home / Approved employers</p><h1>Find your next team.</h1><p>Employers approved by Isabela Careers. Approval is portal moderation, not government accreditation.</p></div><label class="directory-search">Search employers<input id="employerSearch" type="search" placeholder="Company name or location" /></label><div id="employersContent" class="resource-grid"></div></section>
+<dialog id="resourceDialog" class="modal"><div class="dialog-body"><button class="modal-close" data-close="resourceDialog" aria-label="Close details">×</button><div id="resourceDetail"></div></div></dialog>
 
-              <div class="metric">
-                <span>COMPANIES HIRING</span>
-                <strong id="totalCompanies">—</strong>
-                <small>With active posts</small>
-              </div>
-
-              <div class="metric">
-                <span>YOUR APPLICATIONS</span>
-                <strong id="myApplicationCount">—</strong>
-                <small>Submitted applications</small>
-              </div>
-            </div>
-
-            <!-- Job Listings -->
-            <section id="jobsArea" class="panel">
-              <div class="section-head">
-                <div>
-                  <span class="eyebrow dark"> DISCOVER OPPORTUNITIES </span>
-
-                  <h2>Find your next opportunity</h2>
-
-                  <p>Search verified and approved postings.</p>
-                </div>
-              </div>
-
-              <!-- Search Filters -->
-              <div class="filters">
-                <select id="categoryFilter" aria-label="Filter by category">
-                  <option value="">All categories</option>
-                  <option>Administration</option>
-                  <option>Education</option>
-                  <option>Information Technology</option>
-                  <option>Healthcare</option>
-                  <option>Retail &amp; Sales</option>
-                  <option>Hospitality</option>
-                  <option>Construction</option>
-                  <option>Other</option>
-                </select>
-
-                <select id="typeFilter" aria-label="Filter by employment type">
-                  <option value="">Any employment type</option>
-                  <option>Full-time</option>
-                  <option>Part-time</option>
-                  <option>Contract</option>
-                  <option>Internship</option>
-                  <option>Remote</option>
-                </select>
-              </div>
-
-              <!-- Dynamic Job Cards -->
-              <div id="jobGrid" class="job-grid">
-                <p class="empty">Loading jobs…</p>
-              </div>
-            </section>
-          </section>
-
-          <!-- ================================
-                     USER DASHBOARD
-                ================================= -->
-          <section id="dashboard" class="view">
+<section id="dashboard" class="view">
             <div class="page-title">
               <span class="eyebrow dark"> YOUR WORKSPACE </span>
 
@@ -284,7 +126,7 @@
             <form id="jobForm" class="panel form-panel hidden">
               <h3>Job information</h3>
 
-              <div class="form-grid">
+              <fieldset class="audience-editor"><legend>Opportunity groups (optional)</legend><p>Select only the groups this vacancy explicitly supports.</p><label><input type="checkbox" name="audiences" value="pwd" /> Persons with disabilities</label><label><input type="checkbox" name="audiences" value="overseas" /> Overseas workers</label><label><input type="checkbox" name="audiences" value="high-school" /> High school graduates</label><label><input type="checkbox" name="audiences" value="government" /> Government vacancy</label></fieldset><div class="form-grid">
                 <label>
                   Job title *
 

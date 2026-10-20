@@ -28,8 +28,8 @@
     const message = e?.message || String(e);
     if (/failed to fetch|fetch failed|networkerror|network request failed/i.test(message))
       return "Cannot reach the database. Check your connection and the Supabase Project URL in config.js.";
-    if (["PGRST205", "42P01", "42883", "PGRST202"].includes(e?.code))
-      return "Database setup is incomplete. Run schema.sql in this project's Supabase SQL Editor.";
+    if (["PGRST205", "PGRST204", "42P01", "42883", "PGRST202"].includes(e?.code))
+      return "Database setup is incomplete. Apply migrations/002-career-portal.sql to an existing database, or schema.sql followed by the migration for a new project.";
     if (e?.code === "42501")
       return "Database access was denied. Check the account permissions and the policies in schema.sql.";
     return message;
@@ -93,6 +93,10 @@
   const isAdmin = () => active() && profile.role === "admin";
   const isCompany = () => active() && profile.role === "company";
   const isSeeker = () => active() && profile.role === "seeker";
+  const vacancyUI = window.Vacancies.create({
+    sb: () => sb, user: () => user, view: () => currentView,
+    isAdmin, isCompany, fmt, err, toast, go, showAuth, renderJobs,
+  });
   const roleNote = () =>
     !user
       ? "Please log in or create an account first."
@@ -133,6 +137,7 @@
       ? `${profile?.full_name || user.email} · ${role || "Member"}`
       : "";
     $("#authBtn").classList.toggle("hidden", !!user);
+    $$(".signup-button").forEach(e => e.classList.toggle("hidden", !!user));
     $("#logoutBtn").classList.toggle("hidden", !user);
     $$('[data-view="admin"]').forEach((e) =>
       e.classList.toggle("hidden", !isAdmin()),
@@ -163,6 +168,7 @@
         .eq("status", "approved")
         .order("created_at", { ascending: false }),
     );
+    await vacancyUI.loadSaved();
     renderJobs();
     $("#totalJobs").textContent = jobs.length;
     $("#totalCompanies").textContent = new Set(
@@ -178,34 +184,13 @@
       jobs = [];
       $("#totalJobs").textContent = "—";
       $("#totalCompanies").textContent = "—";
+      $("#resultCount").textContent = "Unable to load vacancies";
       $("#jobGrid").innerHTML = `<div class="panel" role="alert"><p>${esc(errorMessage(e))}</p><button class="btn" data-retry-connection>Retry connection</button></div>`;
       throw e;
     }
   }
   function renderJobs() {
-    const term = $("#searchBox").value.trim().toLowerCase(),
-      location = $("#locationSearch").value.trim().toLowerCase(),
-      cat = $("#categoryFilter").value,
-      type = $("#typeFilter").value;
-    const matching = jobs.filter(
-      (j) =>
-        (!term ||
-          [j.title, j.description, j.qualifications, j.company_name, j.location]
-            .join(" ")
-            .toLowerCase()
-            .includes(term)) &&
-        (!location || (j.location || "").toLowerCase().includes(location)) &&
-        (!cat || j.category === cat) &&
-        (!type || j.employment_type === type),
-    );
-    $("#jobGrid").innerHTML = matching.length
-      ? matching
-          .map(
-            (j) =>
-              `<article class="job-card"><div class="job-card-head"><div class="job-logo">${esc((j.company_name || "C").slice(0, 1).toUpperCase())}</div><div><h3>${esc(j.title)}</h3><div class="company">${esc(j.company_name || "Local employer")}</div></div></div><div class="job-meta"><span class="pill green">${esc(j.employment_type)}</span><span class="pill">${esc(j.category)}</span></div><p>${esc(j.description).slice(0, 145)}${j.description.length > 145 ? "…" : ""}</p><div class="job-bottom"><small>⌖ ${esc(j.location)} · ${fmt(j.created_at)}</small><button class="mini" data-details="${j.id}">View details →</button></div></article>`,
-          )
-          .join("")
-      : empty("No jobs match your search. Try adjusting the filters.");
+    return vacancyUI.jobList(jobs);
   }
   const reqList = (req) =>
     req?.length
@@ -233,11 +218,11 @@
     const j = jobs.find((x) => x.id === id);
     if (!j) return;
     $("#jobDialog").close();
+    $("#applyForm").reset();
     $("#applyJobId").value = id;
     $("#applyJobTitle").textContent = "Apply: " + j.title;
     $("#requiredFiles").innerHTML =
       "<strong>Employer requirements</strong>" + reqList(j.requirements);
-    $("#applyForm").reset();
     $("#applyDialog").showModal();
   }
   async function submitApplication(e) {
@@ -404,6 +389,8 @@
     }
   }
   async function renderView() {
+    if (["fairs", "training", "advice", "employers"].includes(currentView))
+      return vacancyUI.renderResources(currentView);
     if (currentView === "dashboard") return dashboard();
     if (currentView === "post") return post();
     if (currentView === "applications") return applications();
@@ -475,6 +462,8 @@
     try {
       const f = new FormData(e.target),
         obj = Object.fromEntries(f.entries());
+      obj.audiences = f.getAll("audiences");
+      if (!obj.audiences.length) delete obj.audiences;
       obj.requirements = obj.requirements
         .split("\n")
         .map((s) => s.trim())
@@ -687,7 +676,7 @@
       content = `<p>Review all application records, documents, and statuses in Applications.</p><button class="btn" data-view="applications">Open applications →</button>`;
     }
     $("#adminContent").innerHTML =
-      `<div class="stats-row"><div class="stat-mini"><b>${total}</b><span>Registered users</span></div><div class="stat-mini"><b>${profiles.filter((p) => p.role === "company" && p.approval_status === "pending").length}</b><span>Pending companies</span></div><div class="stat-mini"><b>${allJobs.filter((j) => j.status === "pending").length}</b><span>Jobs awaiting review</span></div><div class="stat-mini"><b>${apps.length}</b><span>Applications *</span></div></div><div class="note">* Dashboard displays the first 500 users/jobs/applications per query. For a larger deployment, add server-side pagination and reporting.</div><div class="panel">${tabs}${content}</div>`;
+      `<div class="section-head"><h2>Portal administration</h2><button class="btn small" data-manage-resources>Manage fairs, training &amp; advice</button></div><div class="stats-row"><div class="stat-mini"><b>${total}</b><span>Registered users</span></div><div class="stat-mini"><b>${profiles.filter((p) => p.role === "company" && p.approval_status === "pending").length}</b><span>Pending companies</span></div><div class="stat-mini"><b>${allJobs.filter((j) => j.status === "pending").length}</b><span>Jobs awaiting review</span></div><div class="stat-mini"><b>${apps.length}</b><span>Applications *</span></div></div><div class="note">* Dashboard displays the first 500 users/jobs/applications per query. For a larger deployment, add server-side pagination and reporting.</div><div class="panel">${tabs}${content}</div>`;
   }
   function statusSelect(p) {
     return p.role === "admin"
@@ -829,6 +818,7 @@
   });
   redrawNav();
   initialize().catch((e) => {
+    $("#resultCount").textContent = "Unable to load vacancies";
     $("#jobGrid").innerHTML = `<div class="panel" role="alert"><p>${esc(errorMessage(e))}</p><button class="btn" data-retry-connection>Retry connection</button></div>`;
     err(e);
   });
