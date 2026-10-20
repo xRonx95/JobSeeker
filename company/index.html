@@ -14,13 +14,13 @@
     <title>Employer dashboard | HapIsabela</title>
 
     <!-- Stylesheet -->
-    <link rel="stylesheet" href="/assets/css/style.css" />
-    <link rel="stylesheet" href="/assets/css/vacancies.css" />
-    <link rel="stylesheet" href="/assets/css/green-theme.css" />
-    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="/assets/css/style.css?v=hapisabela-2" />
+    <link rel="stylesheet" href="/assets/css/vacancies.css?v=hapisabela-2" />
+    <link rel="stylesheet" href="/assets/css/green-theme.css?v=hapisabela-2" />
+    <link rel="icon" href="/favicon.ico?v=hapisabela-2" type="image/x-icon" />
 
     <!-- Supabase Configuration -->
-    <script src="/config.js"></script>
+    <script src="/config.js?v=hapisabela-2"></script>
 
     <!-- Supabase JavaScript Library -->
     <script
@@ -28,13 +28,13 @@
       src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"
     ></script>
 
-    <script defer src="/assets/js/vacancies.js"></script>
-    <script defer src="/assets/js/password.js"></script>
-    <script defer src="/assets/js/admin-users.js"></script>
-    <script defer src="/assets/js/auth.js"></script>
-    <script defer src="/assets/js/admin-dashboard.js"></script>
+    <script defer src="/assets/js/vacancies.js?v=hapisabela-2"></script>
+    <script defer src="/assets/js/password.js?v=hapisabela-2"></script>
+    <script defer src="/assets/js/admin-users.js?v=hapisabela-2"></script>
+    <script defer src="/assets/js/auth.js?v=hapisabela-2"></script>
+    <script defer src="/assets/js/admin-dashboard.js?v=hapisabela-2"></script>
     <!-- Main Application Script -->
-    <script defer src="/assets/js/script.js"></script>
+    <script defer src="/assets/js/script.js?v=hapisabela-2"></script>
   </head>
 
   <body data-portal="company">
@@ -51,7 +51,7 @@
                  TOP NAVIGATION BAR
             ====================================== -->
         <header class="site-header vacancy-header">
-  <div class="topbar"><a class="brand" href="/" aria-label="HapIsabela home"><img class="brand-logo" src="/favicon.ico" alt="HapIsabela logo" width="64" height="64" /><span class="brand-name">HapIsabela<small>LOCAL TALENT. REAL OPPORTUNITY.</small></span></a>
+  <div class="topbar"><a class="brand" href="/" aria-label="HapIsabela home"><img class="brand-logo" src="/favicon.ico?v=hapisabela-2" alt="HapIsabela logo" width="64" height="64" /><span class="brand-name">HapIsabela<small>LOCAL TALENT. REAL OPPORTUNITY.</small></span></a>
   <button id="menuBtn" type="button" class="ghost mobile" aria-label="Toggle navigation" aria-controls="nav" aria-expanded="false">Menu</button>
   <nav id="nav" class="primary-nav" aria-label="Main navigation"><button class="nav-link active" data-view="home">Jobs</button><button class="nav-link" data-view="fairs">Job fairs</button><button class="nav-link" data-view="training">Training</button><button class="nav-link" data-view="advice">Career advice</button><button class="nav-link" data-view="employers">Approved employers</button><button class="nav-link" data-view="dashboard">Dashboard</button><button class="nav-link" data-view="post">Post a job</button><button class="nav-link" data-view="applications">Applications</button><button class="nav-link" data-view="admin">Admin</button><button class="nav-link" data-view="profile">My profile</button></nav>
   <div class="top-actions"><span id="signedInAs" class="muted"></span><button type="button" class="btn small signup-button" data-auth="register">Sign up</button><button id="authBtn" type="button" class="btn small">Log in</button><button id="logoutBtn" type="button" class="btn outline small hidden">Log out</button></div></div>
@@ -359,7 +359,7 @@
     <dialog id="authDialog" class="modal auth-card" aria-labelledby="authTitle">
   <form id="authForm" class="dialog-body auth-card-body">
     <button type="button" class="close auth-close" data-close="authDialog" aria-label="Close authentication dialog">×</button>
-    <img src="/favicon.ico" alt="HapIsabela logo" class="auth-logo" width="112" height="112" />
+    <img src="/favicon.ico?v=hapisabela-2" alt="HapIsabela logo" class="auth-logo" width="112" height="112" />
     <p class="auth-brand-name">HapIsabela</p>
     <h2 id="authTitle">Log in to HapIsabela</h2>
     <p id="authSubtitle">Your next opportunity starts here.</p>
@@ -381,6 +381,7 @@
     <p id="authStatus" role="status" aria-live="polite"></p>
   </form>
 </dialog>
+
 
 
 

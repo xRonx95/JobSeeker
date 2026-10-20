@@ -36,7 +36,7 @@ test('every role portal has unique IDs and references existing local assets',()=
     const html=fs.readFileSync(path.join(root,file),'utf8');
     const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
     assert.equal(new Set(ids).size,ids.length,`${file} has duplicate IDs`);
-    for(const match of html.matchAll(/(?:src|href)="(\/[^"#]+)"/g))assert.ok(fs.existsSync(path.join(root,match[1])),`${file}: missing ${match[1]}`);
+    for(const match of html.matchAll(/(?:src|href)="(\/[^"#]+)"/g))assert.ok(fs.existsSync(path.join(root,match[1].split('?')[0])),`${file}: missing ${match[1]}`);
     for(const id of ['home','fairs','training','advice','employers','admin','profile','dashboard','resourceDialog','jobGrid','sortJobs'])assert.ok(ids.includes(id),`${file}: missing ${id}`);
     assert.ok(html.indexOf('/assets/js/vacancies.js')<html.indexOf('/assets/js/script.js'));
   }

@@ -103,8 +103,8 @@ async function main(){
   await evaluate("document.querySelector('#authBtn').click()");
   assert.equal(await evaluate("document.querySelector('#authTitle').textContent"),'Log in to HapIsabela');
   assert.match(await evaluate("document.querySelector('#toggleAuth').textContent"),/Create an account.*Sign up/);
-  assert.equal(await evaluate("document.querySelector('.brand-logo').getAttribute('src')"),'/favicon.ico');
-  assert.equal(await evaluate("document.querySelector('.auth-logo').getAttribute('src')"),'/favicon.ico');
+  assert.equal(await evaluate("new URL(document.querySelector('.brand-logo').src).pathname"),'/favicon.ico');
+  assert.equal(await evaluate("new URL(document.querySelector('.auth-logo').src).pathname"),'/favicon.ico');
   assert.ok(await evaluate("parseFloat(getComputedStyle(document.body).fontSize)>=18"));
   const loginShot=await send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(output,'login-green.png'),Buffer.from(loginShot.data,'base64'));
   await evaluate("document.querySelector('#toggleAuth').click()");
