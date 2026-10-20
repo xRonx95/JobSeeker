@@ -30,6 +30,19 @@ isabela-careers-role-folders/
 5. Publish this folder's **contents as the Vercel project root**. Framework preset: Other; no build command; output directory: default/root. All folders must be committed.
 6. Register the first user, then assign its Admin role using the SQL documented below. Never allow untrusted users to self-elevate roles.
 
+## Check a failed database connection
+
+Run `node scripts/check-connection.cjs` (Node.js 18 or newer). This checks the Auth endpoint and reads at most one approved job using the public key; it does not modify data.
+
+- `ENOTFOUND`: copy the exact Project URL from Supabase's Connect dialog into `config.js`. A key cannot repair an incorrect hostname.
+- HTTP 401: verify that the publishable key belongs to that same project.
+- Missing `jobs` table: run `schema.sql` once on the new project in Supabase SQL Editor. API keys cannot create the database schema.
+- Permission denied: review the grants and Row Level Security policies in `schema.sql`.
+
+After changing `config.js`, redeploy the updated files to the existing Vercel project. The local changes do not update an existing deployment automatically.
+
+Keep `sb_secret_` keys out of this static site. If a secret key was shared, revoke it in Supabase Settings > API Keys and create a replacement for any server that needs it.
+
 ## Role pages
 
 - `/` — public job listings and login/signup

@@ -24,7 +24,17 @@
   const badge = (s) =>
     `<span class="pill ${s === "approved" || s === "active" || s === "hired" ? "green" : s === "pending" || s === "reviewing" ? "gold" : s === "rejected" || s === "suspended" ? "red" : ""}">${esc(s || "—")}</span>`;
   const empty = (s) => `<p class="empty">${esc(s)}</p>`;
-  const err = (e) => toast(e?.message || String(e), "error");
+  function errorMessage(e) {
+    const message = e?.message || String(e);
+    if (/failed to fetch|fetch failed|networkerror|network request failed/i.test(message))
+      return "Cannot reach the database. Check your connection and the Supabase Project URL in config.js.";
+    if (["PGRST205", "42P01", "42883", "PGRST202"].includes(e?.code))
+      return "Database setup is incomplete. Run schema.sql in this project's Supabase SQL Editor.";
+    if (e?.code === "42501")
+      return "Database access was denied. Check the account permissions and the policies in schema.sql.";
+    return message;
+  }
+  const err = (e) => toast(errorMessage(e), "error");
   const toast = (s, type = "") => {
     const t = $("#toast");
     t.textContent = s;
@@ -64,11 +74,16 @@
     return false;
   }
 
-  const configured = () =>
-    window.ISABELA_SUPABASE_URL?.startsWith("https://") &&
-    !window.ISABELA_SUPABASE_URL.includes("YOUR-") &&
-    window.ISABELA_SUPABASE_KEY &&
-    !window.ISABELA_SUPABASE_KEY.includes("YOUR_");
+  const configured = () => {
+    try {
+      const url = new URL(window.ISABELA_SUPABASE_URL);
+      const key = window.ISABELA_SUPABASE_KEY || "";
+      return url.protocol === "https:" && !url.hostname.includes("YOUR-") &&
+        (key.startsWith("sb_publishable_") || key.startsWith("eyJ"));
+    } catch {
+      return false;
+    }
+  };
   async function q(p) {
     const { data, error } = await p;
     if (error) throw error;
@@ -139,6 +154,8 @@
     redrawNav();
   }
   async function loadJobs() {
+    $("#jobGrid").textContent = "Loading jobs…";
+    try {
     jobs = await q(
       sb
         .from("jobs")
@@ -157,6 +174,13 @@
       );
       $("#myApplicationCount").textContent = a.length;
     } else $("#myApplicationCount").textContent = user ? "—" : "Sign in";
+    } catch (e) {
+      jobs = [];
+      $("#totalJobs").textContent = "—";
+      $("#totalCompanies").textContent = "—";
+      $("#jobGrid").innerHTML = `<div class="panel" role="alert"><p>${esc(errorMessage(e))}</p><button class="btn" data-retry-connection>Retry connection</button></div>`;
+      throw e;
+    }
   }
   function renderJobs() {
     const term = $("#searchBox").value.trim().toLowerCase(),
@@ -312,6 +336,8 @@
     e.preventDefault();
     if (!configured())
       return toast("Configure Supabase in config.js first.", "error");
+    if (!sb)
+      return toast("The database client is unavailable. Reload the page and check your connection.", "error");
     const btn = $("#authSubmit");
     btn.disabled = true;
     const f = new FormData(e.target);
@@ -720,7 +746,8 @@
       window.ISABELA_SUPABASE_URL,
       window.ISABELA_SUPABASE_KEY,
     );
-    const { data } = await sb.auth.getUser();
+    const { data, error } = await sb.auth.getUser();
+    if (error && error.name !== "AuthSessionMissingError") throw error;
     user = data?.user || null;
     if (user) await loadProfile();
     else redrawNav();
@@ -769,6 +796,10 @@
     (id) => $("#" + id).addEventListener("input", renderJobs),
   );
   document.addEventListener("click", (e) => {
+    if (e.target.closest("[data-retry-connection]")) {
+      location.reload();
+      return;
+    }
     const x = e.target.closest(
       "[data-view],[data-goto],[data-auth],[data-details],[data-apply],[data-close],[data-closejob],[data-admin-tab]",
     );
@@ -797,5 +828,8 @@
     $("#jobsArea").scrollIntoView({ behavior: "smooth" });
   });
   redrawNav();
-  initialize().catch(err);
+  initialize().catch((e) => {
+    $("#jobGrid").innerHTML = `<div class="panel" role="alert"><p>${esc(errorMessage(e))}</p><button class="btn" data-retry-connection>Retry connection</button></div>`;
+    err(e);
+  });
 })();

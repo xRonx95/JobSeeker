@@ -5,7 +5,7 @@
 // Public browser configuration only.
 
 window.ISABELA_SUPABASE_URL =
-  "https://hderthposugfbjiwwvjm.supabase.co";
+  "https://hderthposugfbijwvvjm.supabase.co";
 
 window.ISABELA_SUPABASE_KEY =
   "sb_publishable_5TMToDJel8DYgokkgekUuA_01COtXBl";
