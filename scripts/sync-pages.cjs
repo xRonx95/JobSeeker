@@ -16,6 +16,6 @@ for (const [folder, role, title] of [
 ]) {
   fs.writeFileSync(path.join(root, folder, 'index.html'), html
     .replace('data-portal="public"', `data-portal="${role}"`)
-    .replace('<title>Isabela Careers | Local Job Portal</title>', `<title>${title} | Isabela Careers</title>`));
+    .replace('<title>HapIsabela | Local Job Portal</title>', `<title>${title} | HapIsabela</title>`));
 }
 console.log('Updated all three role portals from index.html.');

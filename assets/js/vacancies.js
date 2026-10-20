@@ -91,7 +91,7 @@
         if(token!==resourceToken)return;
         resources = [...resources.filter(r=>r.kind!==kind),...data];
         const display = kind==='advice'?[...guides,...data]:data;
-        target.innerHTML=display.map(resourceCard).join('')||`<div class="empty"><h3>No upcoming ${view==='fairs'?'job fairs':'training programs'} yet</h3><p>Check back for events published by Isabela Careers.</p></div>`;
+        target.innerHTML=display.map(resourceCard).join('')||`<div class="empty"><h3>No upcoming ${view==='fairs'?'job fairs':'training programs'} yet</h3><p>Check back for events published by HapIsabela.</p></div>`;
       } catch(error) { if(token===resourceToken) { if(kind==='advice')target.innerHTML=guides.map(resourceCard).join(''); else failure(target,error); } }
     }
     function renderEmployers() {

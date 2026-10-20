@@ -32,11 +32,15 @@ async function main(){
   });
   await new Promise(r=>server.listen(0,'127.0.0.1',r));
   const base=`http://127.0.0.1:${server.address().port}`;
-  const profile=path.join(output,`chrome-${process.pid}`);
+  const profile=path.join(output,`chrome-${process.pid}-${Date.now()}`);
   chrome=spawn('C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',['--headless','--disable-gpu','--no-first-run','--no-default-browser-check','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{windowsHide:true,stdio:'ignore'});
   const portFile=path.join(profile,'DevToolsActivePort');
-  for(let i=0;i<100&&!fs.existsSync(portFile);i++)await wait(100);
-  const port=fs.readFileSync(portFile,'utf8').split('\n')[0];
+  let port;
+  for(let i=0;i<100&&!port;i++){
+    try {const value=fs.readFileSync(portFile,'utf8').split('\n')[0];if(/^\d+$/.test(value))port=value;}catch{}
+    if(!port)await wait(100);
+  }
+  if(!port)throw new Error('Chrome did not expose its debugging port.');
   const tabs=await (await fetch(`http://127.0.0.1:${port}/json/list`)).json();
   ws=new WebSocket(tabs.find(x=>x.type==='page').webSocketDebuggerUrl);
   await new Promise((resolve,reject)=>{ws.onopen=resolve;ws.onerror=reject;});
@@ -97,6 +101,11 @@ async function main(){
   assert.equal(await evaluate("document.querySelector('.signup-button')!==null"),true,'Signup button is missing');
   const icon=await fetch(base+'/favicon.ico');assert.equal(icon.status,200);assert.equal(Buffer.from(await icon.arrayBuffer()).readUInt16LE(2),1);
   await evaluate("document.querySelector('#authBtn').click()");
+  assert.equal(await evaluate("document.querySelector('#authTitle').textContent"),'Log in to HapIsabela');
+  assert.match(await evaluate("document.querySelector('#toggleAuth').textContent"),/Create an account.*Sign up/);
+  assert.equal(await evaluate("document.querySelector('.brand-logo').getAttribute('src')"),'/favicon.ico');
+  assert.equal(await evaluate("document.querySelector('.auth-logo').getAttribute('src')"),'/favicon.ico');
+  assert.ok(await evaluate("parseFloat(getComputedStyle(document.body).fontSize)>=18"));
   const loginShot=await send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(output,'login-green.png'),Buffer.from(loginShot.data,'base64'));
   await evaluate("document.querySelector('#toggleAuth').click()");
   assert.deepEqual(await evaluate("[...document.querySelector('#roleSelect').options].map(x=>x.value)"),['seeker','company']);

@@ -8,10 +8,10 @@
 
     <meta
       name="description"
-      content="Isabela Careers: employment and recruiting portal for Isabela City, Basilan"
+      content="HapIsabela: employment and recruiting portal for Isabela City, Basilan"
     />
 
-    <title>Employer dashboard | Isabela Careers</title>
+    <title>Employer dashboard | HapIsabela</title>
 
     <!-- Stylesheet -->
     <link rel="stylesheet" href="/assets/css/style.css" />
@@ -51,7 +51,7 @@
                  TOP NAVIGATION BAR
             ====================================== -->
         <header class="site-header vacancy-header">
-  <div class="topbar"><a class="brand" href="/"><span class="brand-icon">IC<span class="brand-spark">✦</span></span><span>ISABELA <strong>CAREERS</strong><small>LOCAL TALENT. REAL OPPORTUNITY.</small></span></a>
+  <div class="topbar"><a class="brand" href="/" aria-label="HapIsabela home"><img class="brand-logo" src="/favicon.ico" alt="HapIsabela logo" width="64" height="64" /><span class="brand-name">HapIsabela<small>LOCAL TALENT. REAL OPPORTUNITY.</small></span></a>
   <button id="menuBtn" type="button" class="ghost mobile" aria-label="Toggle navigation" aria-controls="nav" aria-expanded="false">Menu</button>
   <nav id="nav" class="primary-nav" aria-label="Main navigation"><button class="nav-link active" data-view="home">Jobs</button><button class="nav-link" data-view="fairs">Job fairs</button><button class="nav-link" data-view="training">Training</button><button class="nav-link" data-view="advice">Career advice</button><button class="nav-link" data-view="employers">Approved employers</button><button class="nav-link" data-view="dashboard">Dashboard</button><button class="nav-link" data-view="post">Post a job</button><button class="nav-link" data-view="applications">Applications</button><button class="nav-link" data-view="admin">Admin</button><button class="nav-link" data-view="profile">My profile</button></nav>
   <div class="top-actions"><span id="signedInAs" class="muted"></span><button type="button" class="btn small signup-button" data-auth="register">Sign up</button><button id="authBtn" type="button" class="btn small">Log in</button><button id="logoutBtn" type="button" class="btn outline small hidden">Log out</button></div></div>
@@ -95,7 +95,7 @@
 <section id="fairs" class="view"><div class="page-title"><p class="breadcrumb">Home / Job fairs</p><h1>Meet your next employer.</h1><p>Upcoming job fairs and recruitment events published by our administrators.</p></div><div id="fairsContent" class="resource-grid"></div></section>
 <section id="training" class="view"><div class="page-title"><p class="breadcrumb">Home / Training</p><h1>Build skills. Open doors.</h1><p>Discover training programs, workshops, and learning opportunities.</p></div><div id="trainingContent" class="resource-grid"></div></section>
 <section id="advice" class="view"><div class="page-title"><p class="breadcrumb">Home / Career advice</p><h1>A little guidance. A big next step.</h1><p>Practical advice for your job search, applications, and interviews.</p></div><div id="adviceContent" class="resource-grid"></div></section>
-<section id="employers" class="view"><div class="page-title"><p class="breadcrumb">Home / Approved employers</p><h1>Find your next team.</h1><p>Employers approved by Isabela Careers. Approval is portal moderation, not government accreditation.</p></div><label class="directory-search">Search employers<input id="employerSearch" type="search" placeholder="Company name or location" /></label><div id="employersContent" class="resource-grid"></div></section>
+<section id="employers" class="view"><div class="page-title"><p class="breadcrumb">Home / Approved employers</p><h1>Find your next team.</h1><p>Employers approved by HapIsabela. Approval is portal moderation, not government accreditation.</p></div><label class="directory-search">Search employers<input id="employerSearch" type="search" placeholder="Company name or location" /></label><div id="employersContent" class="resource-grid"></div></section>
 <dialog id="resourceDialog" class="modal"><div class="dialog-body"><button class="modal-close" data-close="resourceDialog" aria-label="Close details">×</button><div id="resourceDetail"></div></div></dialog>
 
 <section id="dashboard" class="view">
@@ -104,7 +104,7 @@
 
               <h1>Dashboard</h1>
 
-              <p id="welcome">Manage your activity on Isabela Careers.</p>
+              <p id="welcome">Manage your activity on HapIsabela.</p>
             </div>
 
             <div id="dashboardContent"></div>
@@ -347,7 +347,7 @@
                  FOOTER
             ====================================== -->
         <footer class="footer">
-          Isabela Careers · An independent employment portal concept · Please
+          HapIsabela · An independent employment portal concept · Please
           verify employers and never pay to apply.
         </footer>
       </div>
@@ -359,9 +359,9 @@
     <dialog id="authDialog" class="modal auth-card" aria-labelledby="authTitle">
   <form id="authForm" class="dialog-body auth-card-body">
     <button type="button" class="close auth-close" data-close="authDialog" aria-label="Close authentication dialog">×</button>
-    <img src="/image/hapisabela.jpg" alt="HAPIsabela" class="auth-logo" width="104" height="104" />
-    <p class="auth-brand-name">ISABELA CAREERS</p>
-    <h2 id="authTitle">Log in to Isabela Careers</h2>
+    <img src="/favicon.ico" alt="HapIsabela logo" class="auth-logo" width="112" height="112" />
+    <p class="auth-brand-name">HapIsabela</p>
+    <h2 id="authTitle">Log in to HapIsabela</h2>
     <p id="authSubtitle">Your next opportunity starts here.</p>
     <div id="registerFields" class="hidden">
       <label>Your name<input name="full_name" id="registerName" maxlength="120" autocomplete="name" placeholder="Your full name" disabled /></label>
@@ -377,10 +377,11 @@
     <button id="authSubmit" class="btn block auth-submit" type="submit">Log in</button>
     <a id="authForgot" href="/reset-password.html" class="auth-forgot">Forgot your password?</a>
     <p id="authSwitchPrompt">Don't have an account yet?</p>
-    <button id="toggleAuth" class="auth-switch" type="button">Create your account</button>
+    <button id="toggleAuth" class="auth-switch" type="button">Create an account · Sign up</button>
     <p id="authStatus" role="status" aria-live="polite"></p>
   </form>
 </dialog>
+
 
 
 

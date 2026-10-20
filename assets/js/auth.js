@@ -7,7 +7,7 @@
       let mode = 'login', busy = false;
       function render() {
         const signup = mode === 'register';
-        $('#authTitle').textContent = signup ? 'Create your account' : 'Log in to Isabela Careers';
+        $('#authTitle').textContent = signup ? 'Create your HapIsabela account' : 'Log in to HapIsabela';
         $('#authSubtitle').textContent = signup ? 'Find your next role or your next great team member.' : 'Your next opportunity starts here.';
         $('#registerFields').classList.toggle('hidden', !signup);
         $('#signupExtras').classList.toggle('hidden', !signup);
@@ -21,7 +21,8 @@
         $('#authSubmit').textContent = signup ? 'Sign up' : 'Log in';
         $('#authForgot').classList.toggle('hidden', signup);
         $('#authSwitchPrompt').textContent = signup ? 'Already have an account?' : "Don't have an account yet?";
-        $('#toggleAuth').textContent = signup ? 'Sign in' : 'Create your account';
+        $('#toggleAuth').textContent = signup ? 'Sign in' : 'Create an account · Sign up';
+        $('#toggleAuth').classList.toggle('signup-callout', !signup);
       }
       function show(nextMode = 'login') {
         if (busy) return;
