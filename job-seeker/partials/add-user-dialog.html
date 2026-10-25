@@ -1,0 +1,26 @@
+<dialog id="addUserDialog" class="modal" aria-labelledby="addUserHeading">
+      <div class="dialog-body">
+        <button type="button" class="close" data-close="addUserDialog" aria-label="Close add user">×</button>
+        <span class="eyebrow dark">ADMINISTRATION</span>
+        <h2 id="addUserHeading">Add user</h2>
+        <p>Create an active account with the role you choose. You will stay signed in as administrator.</p>
+        <form id="addUserForm">
+          <label>Full name<input name="full_name" required maxlength="120" autocomplete="off" /></label>
+          <label>Email address<input name="email" type="email" required maxlength="254" autocomplete="off" /></label>
+          <label>Account role<select name="role"><option value="seeker">Job seeker</option><option value="company">Company / Employer</option><option value="admin">Administrator</option></select></label>
+          <label id="addUserCompany" class="hidden">Company name<input name="company_name" maxlength="180" disabled /></label>
+          <p id="addUserAdminNotice" class="note hidden">Administrators can create users, approve employers, and manage the portal. Grant this role only to someone you trust.</p>
+          <label>Initial password (optional)<input name="password" type="password" minlength="8" maxlength="128" autocomplete="new-password" /></label>
+          <p class="muted">Leave blank to generate a strong password. This account will not require a confirmation email. Share its login details privately.</p>
+          <button type="submit" class="btn">Create account</button>
+        </form>
+        <p id="addUserStatus" role="status" aria-live="polite"></p>
+        <section id="createdUserDetails" class="hidden" aria-label="New user login details">
+          <label>Email<input id="createdUserEmail" readonly /></label>
+          <label>Initial password<input id="createdUserPassword" type="password" readonly autocomplete="off" /></label>
+          <button id="showCreatedPassword" type="button" class="text-button" aria-pressed="false">Show password</button>
+          <p>Save these details before closing. The password is shown here once. Ask the user to change it in Profile settings after logging in.</p>
+          <button id="addAnotherUser" type="button" class="btn">Add another user</button>
+        </section>
+      </div>
+    </dialog>

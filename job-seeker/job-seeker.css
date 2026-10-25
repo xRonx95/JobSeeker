@@ -1,0 +1,27 @@
+/* Seeker workspace shares the compact green and white portal design. */
+body[data-portal="seeker"],body[data-portal="seeker"] .main {background:#f4f6f4;}
+body[data-portal="seeker"] .site-header.vacancy-header {background:#fff;border-bottom:1px solid #dfe6df;}
+body[data-portal="seeker"] .vacancy-header .brand-name {color:#214332;}
+body[data-portal="seeker"] .vacancy-header .brand small {color:#7b8b7f;}
+body[data-portal="seeker"] .vacancy-header .nav-link {color:#617167;}
+body[data-portal="seeker"] .vacancy-header .nav-link.active {color:#215d3c;border-color:#215d3c;}
+body[data-portal="seeker"] .vacancy-header .btn.outline {color:#335c43;border-color:#cbd9cf;background:#fff;}
+body[data-portal="seeker"] main#content {max-width:1400px;padding:0 36px 65px;}
+body[data-portal="seeker"] .page-title {border-bottom:1px solid #dfe6df;}
+body[data-portal="seeker"] .panel {border:1px solid #dfe6df;background:#fff;box-shadow:none;padding:24px;}
+body[data-portal="seeker"] .form-panel {max-width:980px;margin-bottom:24px;}
+.seeker-profile-tabs {display:flex;flex-wrap:wrap;gap:6px;border-bottom:1px solid #e3e9e2;padding-bottom:16px;margin-bottom:18px;}
+.seeker-profile-tabs button {background:transparent;border:1px solid transparent;border-radius:4px;padding:10px 16px;color:#63766a;font-size:13px;min-height:42px;}
+.seeker-profile-tabs button[aria-selected="true"] {background:#eaf2eb;color:#285d3c;border-color:#dce8dc;font-weight:600;}
+body[data-portal="seeker"] .seeker-profile-note {font-size:12px;color:#7a887e;margin-bottom:24px;}
+body[data-portal="seeker"] [role="tabpanel"] h2 {font-size:18px;}
+body[data-portal="seeker"] [role="tabpanel"]>p {font-size:13px;margin:6px 0 22px;}
+body[data-portal="seeker"] [role="tabpanel"][hidden] {display:none;}
+.seeker-profile-actions {display:flex;align-items:center;justify-content:space-between;gap:16px;border-top:1px solid #e3e9e2;padding-top:22px;margin-top:22px;}
+.seeker-profile-actions span {font-size:12px;color:#7a887e;}
+body[data-portal="seeker"] input,body[data-portal="seeker"] textarea,body[data-portal="seeker"] select {border-color:#d7e0d6;box-shadow:none;}
+body[data-portal="seeker"] .btn {background:#276345;border-color:#276345;box-shadow:none;}
+body[data-portal="seeker"] .stat-mini {border:1px solid #e0e7df;border-top:3px solid #789681;background:#fff;box-shadow:none;border-radius:6px;}
+body[data-portal="seeker"] th {background:#f6f8f4;}
+body[data-portal="seeker"] .footer {background:#eef2ec;border-top:1px solid #dce4d9;}
+@media(max-width:800px){body[data-portal="seeker"] main#content{padding:0 20px 35px;max-width:none;}body[data-portal="seeker"] .panel{padding:18px;}.seeker-profile-tabs{display:grid;grid-template-columns:1fr 1fr;}.seeker-profile-tabs button{padding:9px 8px;font-size:12px;}.seeker-profile-actions{align-items:stretch;flex-direction:column;}}

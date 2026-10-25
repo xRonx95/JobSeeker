@@ -1,0 +1,18 @@
+<section id="profile" class="view">
+<div class="page-title"><span class="eyebrow dark">YOUR ACCOUNT</span><h1>Personal information</h1><p>Manage your personal details, education, family information, and professional background.</p></div>
+<div id="profileGate" class="panel"></div>
+<form id="profileForm" class="panel form-panel hidden" data-seeker-extended>
+<div class="seeker-profile-tabs" role="tablist" aria-label="Personal information sections"><button type="button" id="tab-personal" role="tab" aria-selected="true" aria-controls="panel-personal" tabindex="0" data-profile-tab="personal">Personal information</button>
+<button type="button" id="tab-education" role="tab" aria-selected="false" aria-controls="panel-education" tabindex="-1" data-profile-tab="education">Education</button>
+<button type="button" id="tab-family" role="tab" aria-selected="false" aria-controls="panel-family" tabindex="-1" data-profile-tab="family">Family</button>
+<button type="button" id="tab-background" role="tab" aria-selected="false" aria-controls="panel-background" tabindex="-1" data-profile-tab="background">Background</button></div>
+<p class="seeker-profile-note">Additional details are optional. Education, family, and background information is private to your account.</p><p id="seekerProfileStatus" role="status" aria-live="polite"></p>
+<!-- seeker-partial: personal-information -->
+<!-- seeker-partial: education -->
+<!-- seeker-partial: family -->
+<!-- seeker-partial: background -->
+<div id="companyNameField" class="hidden"><input type="hidden" name="company_name" /></div>
+<div class="seeker-profile-actions"><span>Save changes across all four sections.</span><button class="btn" type="submit">Save personal information</button></div>
+</form>
+<!-- seeker-partial: account-security -->
+</section>

@@ -142,7 +142,7 @@
         form.elements.starts_at.value=r.starts_at?new Date(new Date(r.starts_at).getTime()+8*3600000).toISOString().slice(0,16):'';
         form.scrollIntoView({behavior:'smooth'});form.elements.title.focus();
       }
-      if(x.dataset.deleteResource&&ctx.isAdmin()&&confirm('Delete this career content?'))query(ctx.sb().from('career_resources').delete().eq('id',x.dataset.deleteResource)).then(adminResources).catch(ctx.err);
+      if(x.dataset.deleteResource&&ctx.isAdmin()&&confirm('Delete this career content?'))query(ctx.sb().from('career_resources').delete().eq('id',x.dataset.deleteResource)).then(async()=>{await adminResources();ctx.toast('Career content deleted.');}).catch(ctx.err);
       if(x.dataset.employerJobs){resetFilters();companyId=x.dataset.employerJobs;ctx.go('home');ctx.renderJobs();}
     });
     $('#clearFilters').addEventListener('click',resetFilters);

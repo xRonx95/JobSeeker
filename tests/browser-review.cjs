@@ -49,7 +49,7 @@ async function main(){
   ws=new WebSocket(tabs.find(x=>x.type==='page').webSocketDebuggerUrl);
   await new Promise((resolve,reject)=>{ws.onopen=resolve;ws.onerror=reject;});
   let seq=0;const pending=new Map(),errors=[];
-  let mockRole='admin', saved=[], content=[], passwordUpdates=0, resetRequests=[], signupRequests=[], failStartup=false, proxyRequests=0;
+  let mockRole='admin', saved=[], content=[], passwordUpdates=0, resetRequests=[], signupRequests=[], failStartup=false, proxyRequests=0, seekerInformation=null, failSeekerSave=false;
   const mockUser={id:'00000000-0000-4000-8000-000000000001',email:'review@example.test',app_metadata:{provider:'email'},user_metadata:{},aud:'authenticated',created_at:'2026-01-01T00:00:00Z'};
   function send(method,params={}){return new Promise((resolve,reject)=>{const id=++seq;pending.set(id,{resolve,reject});ws.send(JSON.stringify({id,method,params}));});}
   const jobs=Array.from({length:23},(_,i)=>({id:`job-${i}`,company_id:i%2?'b':'a',title:i%2?'Office Assistant':'Software Developer',company_name:i%2?'Basilan Community Services':'Isabela Technology Group',location:'Isabela City, Basilan',category:i%2?'Administration':'Information Technology',employment_type:'Full-time',description:'An opportunity to grow your career in the local community.',qualifications:'Communication and teamwork skills.',requirements:['Resume'],audiences:i%2?['pwd','high-school']:[],salary:i%2?'₱18,000–₱22,000 / month':null,status:'approved',created_at:new Date(Date.UTC(2026,9,20-i)).toISOString()}));
@@ -72,6 +72,12 @@ async function main(){
       if(url.pathname==='/rest/v1/profiles'){
         const profile={id:mockUser.id,email:mockUser.email,full_name:'Review account',company_name:'Review employer',role:mockRole,approval_status:'active'};
         data=url.searchParams.has('id')?profile:[profile,...fixtureProfiles,...createdAccounts];
+      }
+      if(url.pathname==='/rest/v1/seeker_information')data=seekerInformation?[seekerInformation]:[];
+      if(url.pathname==='/rest/v1/rpc/save_my_seeker_information'){
+        if(failSeekerSave){await send('Fetch.fulfillRequest',{requestId,responseCode:503,responseHeaders:[{name:'Content-Type',value:'application/json'}],body:Buffer.from(JSON.stringify({message:'Unable to save right now'})).toString('base64')});return;}
+        const input=JSON.parse(request.postData);
+        seekerInformation={user_id:mockUser.id,personal:input.p_personal,education:input.p_education,family:input.p_family,background:input.p_background};data=null;
       }
       if(url.pathname==='/rest/v1/saved_jobs'){
         if(request.method==='POST'){const row=JSON.parse(request.postData);saved=[row];}
@@ -120,15 +126,20 @@ async function main(){
   await evaluate("document.querySelector('#toggleAuth').click()");
   assert.deepEqual(await evaluate("[...document.querySelector('#roleSelect').options].map(x=>x.value)"),['seeker','company']);
   for(const role of ['seeker','company']){
+    await evaluate("document.querySelector('#notificationDialog')?.close();document.querySelector('.signup-button').click()");
     await evaluate(`{const f=document.querySelector('#authForm');f.elements.full_name.value='Public ${role}';f.elements.requested_role.value='${role}';f.elements.requested_role.dispatchEvent(new Event('change'));f.elements.email.value='public-${role}@example.test';f.elements.password.value='Signup-only-password1!';document.querySelector('#signupConsent').checked=true;${role==='company'?"f.elements.company_name.value='Public Company';":''}}`);
     if(role==='company'){const signupShot=await send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(output,'signup-green.png'),Buffer.from(signupShot.data,'base64'));}
     await evaluate("document.querySelector('#authForm').requestSubmit()");
     await until("document.querySelector('#authStatus').textContent.includes('Check your email')");
+    assert.equal(await evaluate("document.querySelector('#authDialog').open"),false,'Signup form stayed open after success');
+    assert.equal(await evaluate("document.querySelector('#notificationDialog').open"),true,'Signup popup is missing');
+    assert.match(await evaluate("document.querySelector('#notificationMessage').textContent"),/Check your email/);
     assert.equal(signupRequests.at(-1).data.requested_role,role);
     assert.equal(signupRequests.at(-1).app_metadata,undefined);
   }
+  await evaluate("document.querySelector('#notificationDialog').close();document.querySelector('.signup-button').click()");
   const signupsBeforeTamper=signupRequests.length;
-  await evaluate("{const f=document.querySelector('#authForm');const option=document.createElement('option');option.value='admin';option.textContent='Admin';f.elements.requested_role.append(option);f.elements.requested_role.value='admin';f.elements.requested_role.dispatchEvent(new Event('change'));f.elements.password.value='Tamper-only-password1!';f.requestSubmit();}");
+  await evaluate("{const f=document.querySelector('#authForm');f.elements.full_name.value='Tamper test';f.elements.email.value='tamper@example.test';document.querySelector('#signupConsent').checked=true;const option=document.createElement('option');option.value='admin';option.textContent='Admin';f.elements.requested_role.append(option);f.elements.requested_role.value='admin';f.elements.requested_role.dispatchEvent(new Event('change'));f.elements.password.value='Tamper-only-password1!';f.requestSubmit();}");
   assert.match(await evaluate("document.querySelector('#authStatus').textContent"),/Choose Job seeker or Company/);
   assert.equal(signupRequests.length,signupsBeforeTamper,'Public admin signup reached the API');
   await evaluate("document.querySelector('#authDialog').close()");
@@ -241,11 +252,13 @@ async function main(){
       fs.writeFileSync(path.join(output,'admin-add-user.png'),Buffer.from(adminShot.data,'base64'));
     }
     await evaluate("document.querySelector('#addUserForm').requestSubmit()");
-    await until("!document.querySelector('#createdUserDetails').classList.contains('hidden')");
-    assert.equal(await evaluate("document.querySelector('#createdUserPassword').type"),'password');
+    await until("document.querySelector('#notificationPassword')!==null");
+    assert.equal(await evaluate("document.querySelector('#addUserDialog').open"),false,'Add user form stayed open after success');
+    assert.equal(await evaluate("document.querySelector('#notificationDialog').open"),true);
+    assert.equal(await evaluate("document.querySelector('#notificationPassword').type"),'password');
     assert.equal(await evaluate("localStorage.getItem('sb-hderthposugfbijwvvjm-auth-token')"),sessionBefore,'Creating a user replaced the admin session');
-    await evaluate("document.querySelector('#addUserDialog').close()");
-    await until("document.querySelector('#createdUserPassword').value===''");
+    await evaluate("document.querySelector('#notificationDialog').close()");
+    await until("document.querySelector('#notificationPassword')===null");
   }
   assert.deepEqual(createdAccounts.map(x=>x.role),['seeker','company','admin']);
   await evaluate("document.querySelector('[data-add-user]').click();{const f=document.querySelector('#addUserForm');f.elements.full_name.value='Duplicate';f.elements.email.value='qa-seeker@example.test';f.requestSubmit();}");
@@ -304,6 +317,44 @@ async function main(){
   await until("document.querySelector('.save-job')?.getAttribute('aria-pressed')==='false'");
   await evaluate("document.querySelector('[data-view=\"profile\"]').click()");
   assert.equal(await evaluate("document.querySelector('#passwordPanel').classList.contains('hidden')"),false);
+  await until("!document.querySelector('#profileForm [type=submit]').disabled");
+  assert.equal(await evaluate("document.querySelector('#profile h1').textContent"),'Personal information');
+  for(const section of ['education','family','background','personal']){
+    await evaluate(`document.querySelector('[data-profile-tab="${section}"]').click()`);
+    assert.equal(await evaluate(`document.querySelector('#panel-${section}').hidden`),false);
+  }
+  await evaluate("{const f=document.querySelector('#profileForm');f.elements['education.school'].value='Isabela College';f.elements['family.emergency_name'].value='Emergency Contact';f.elements['background.skills'].value='Customer service';f.elements['personal.nationality'].value='Filipino';f.requestSubmit();}");
+  await until("document.querySelector('#seekerProfileStatus').textContent.includes('has been saved')");
+  assert.equal(seekerInformation.education.school,'Isabela College');
+  assert.equal(seekerInformation.family.emergency_name,'Emergency Contact');
+  assert.equal(seekerInformation.background.skills,'Customer service');
+  await evaluate("document.querySelector('#notificationDialog').close()");
+  await send('Page.reload');
+  await until("document.querySelector('#welcome')?.textContent.includes('Review account')");
+  await evaluate("document.querySelector('[data-view=\"profile\"]').click()");
+  await until("document.querySelector('#profileForm').elements['education.school'].value==='Isabela College'");
+  assert.equal(await evaluate("document.querySelector('#profileForm').elements['family.emergency_name'].value"),'Emergency Contact');
+  failSeekerSave=true;
+  await evaluate("document.querySelector('#profileForm').elements['background.skills'].value='Unsaved draft';document.querySelector('#profileForm').requestSubmit()");
+  await until("document.querySelector('#notificationDialog').dataset.type==='error'&&document.querySelector('#notificationDialog').open");
+  assert.equal(await evaluate("document.querySelector('#profileForm').elements['background.skills'].value"),'Unsaved draft');
+  assert.equal(seekerInformation.background.skills,'Customer service');
+  failSeekerSave=false;
+  await evaluate("document.querySelector('#notificationDialog').close()");
+  await evaluate("document.querySelector('#tab-personal').focus()");
+  await send('Input.dispatchKeyEvent',{type:'keyDown',key:'ArrowRight',code:'ArrowRight'});
+  assert.equal(await evaluate("document.querySelector('#tab-education').getAttribute('aria-selected')"),'true','Keyboard tab navigation failed');
+  for(const width of [320,390,768]){
+    await send('Emulation.setDeviceMetricsOverride',{width,height:844,deviceScaleFactor:1,mobile:true});
+    for(const section of ['personal','education','family','background']){
+      await evaluate(`document.querySelector('[data-profile-tab="${section}"]').click()`);
+      assert.equal(await evaluate('document.documentElement.scrollWidth<=window.innerWidth'),true,'Seeker '+section+' tab overflows at '+width+'px');
+    }
+  }
+  await send('Emulation.setDeviceMetricsOverride',{width:1365,height:1000,deviceScaleFactor:1,mobile:false});
+  await evaluate("document.querySelector('#tab-personal').click()");
+  const seekerShot=await send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(output,'seeker-personal-information.png'),Buffer.from(seekerShot.data,'base64'));
+
   await evaluate("{const f=document.querySelector('#passwordForm');f.elements.new_password.value='Review-only-password1!';f.elements.confirm_password.value='Different-password1!';f.requestSubmit();}");
   assert.match(await evaluate("document.querySelector('#passwordStatus').textContent"),/do not match/);
   assert.equal(passwordUpdates,0,'Mismatched passwords reached the API');
@@ -354,6 +405,6 @@ async function main(){
   assert.ok(proxyRequests>20,'SDK calls did not use the same-origin database route');
   console.log('Browser checks passed: app-style mobile navigation, category chips, filter toggle, saved/account/activity flows, detail sheet, 320–768px layouts, install manifest/offline fallback, and all portal/auth regression checks.');
   console.log('Screenshots: .tmp-ui/vacancies-desktop.png and .tmp-ui/vacancies-mobile.png');
-  await send('Browser.close').catch(()=>{});
+  await Promise.race([send('Browser.close').catch(()=>{}),wait(1000)]);
 }
 main().catch(error=>{console.error(error);process.exitCode=1;}).finally(()=>{ws?.close();chrome?.kill();server?.close();});

@@ -7,6 +7,7 @@
     const message = (text, error = false) => {
       status.textContent = text;
       status.className = error ? 'password-error' : 'password-feedback';
+      if (!/^(Sending reset link|Updating password)/.test(text)) window.IsabelaNotifications.show(text, {type:error ? 'error' : 'success',title:error ? undefined : 'Account security'});
     };
     const describe = error => error.status === 429 || /rate limit/i.test(error.message)
       ? 'Too many requests. Please wait before trying again. If you are signed in, you can update your password directly in Profile settings.'

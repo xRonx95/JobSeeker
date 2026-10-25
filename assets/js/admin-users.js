@@ -65,15 +65,13 @@
           const result = await response.json().catch(() => null);
           if (!response.ok) throw new Error(responseError(response, result));
           if (!result?.user?.email || !result.temporary_password) throw new Error('The result could not be verified. Check All users before retrying.');
-          form.reset(); form.classList.add('hidden');
-          $('#createdUserEmail').value = result.user.email;
-          $('#createdUserPassword').value = result.temporary_password;
-          $('#createdUserDetails').classList.remove('hidden');
-          status.className = 'password-feedback'; status.textContent = result.message;
-          try { await refresh(); } catch { status.textContent += ' Refresh the user list to see the new account.'; }
+          form.reset();
+          window.IsabelaNotifications.show(result.message, {title:'Account created',credentials:{email:result.user.email,password:result.temporary_password}});
+          try { await refresh(); } catch { /* The account is created; keep its credentials available in the popup. */ }
         } catch (error) {
           status.className = 'password-error';
           status.textContent = error instanceof TypeError ? 'The request could not be completed. Check All users before retrying to avoid a duplicate account.' : error.message;
+          window.IsabelaNotifications.show(status.textContent, {type:'error'});
         } finally { busy = false; button.disabled = false; close.disabled = false; }
       });
     },

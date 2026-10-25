@@ -38,7 +38,7 @@
         event.preventDefault(); if (busy) return;
         const signup = mode === 'register', f = new FormData(form);
         const role = f.get('requested_role');
-        if (signup && !['seeker','company'].includes(role)) { status.textContent = 'Choose Job seeker or Company / Employer.'; return; }
+        if (signup && !['seeker','company'].includes(role)) { status.textContent = 'Choose Job seeker or Company / Employer.'; window.IsabelaNotifications.show(status.textContent, {type:'error'}); return; }
         busy = true;
         $('#authSubmit').disabled = true; $('#toggleAuth').disabled = true; dialog.querySelector('[data-close]').disabled = true;
         status.className = ''; status.textContent = signup ? 'Creating your account…' : 'Logging in…';
@@ -54,8 +54,10 @@
           if (signup && !data.session) {
             status.className = 'password-feedback';
             status.textContent = 'Registration received. Check your email to confirm your account before logging in.' + (role === 'company' ? ' Company accounts also need administrator approval before posting jobs.' : '');
+            window.IsabelaNotifications.show(status.textContent, {title:'Registration received'});
           } else {
             dialog.close();
+            window.IsabelaNotifications.show(signup ? 'Your account has been created.' + (role === 'company' ? ' Administrator approval is required before posting jobs.' : '') : 'You have logged in successfully.', {title:signup ? 'Account created' : 'Welcome back'});
             await signedIn(data.user);
           }
         } catch (error) {
@@ -63,6 +65,7 @@
           status.textContent = error.status === 429 ? 'Too many requests. Please wait before trying again.'
             : error.code === 'signup_disabled' || /database error saving new user/i.test(error.message) ? 'Signup is not enabled yet. The project owner must enable signup and apply the latest signup migration.'
               : error.message || 'Unable to sign in. Please try again.';
+          window.IsabelaNotifications.show(status.textContent, {type:'error'});
         } finally { busy = false; $('#authSubmit').disabled = false; $('#toggleAuth').disabled = false; dialog.querySelector('[data-close]').disabled = false; }
       });
       render();

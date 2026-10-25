@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Basic Metadata -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#113c29" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="HapIsabela" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/assets/icons/app-192.png?v=hapisabela-mobile-3" />
+
+    <meta
+      name="description"
+      content="HapIsabela: employment and recruiting portal for Isabela City, Basilan"
+    />
+
+    <title>Job seeker dashboard | HapIsabela</title>
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="/assets/css/style.css?v=hapisabela-mobile-3" />
+    <link rel="stylesheet" href="/assets/css/vacancies.css?v=hapisabela-mobile-3" />
+    <link rel="stylesheet" href="/assets/css/green-theme.css?v=hapisabela-mobile-3" />
+    <link rel="stylesheet" href="/assets/css/mobile-app.css?v=hapisabela-mobile-3" />
+    <link rel="stylesheet" href="/job-seeker/job-seeker.css?v=profile-1" />
+    <link rel="stylesheet" href="/assets/css/compact-theme.css?v=connection-1" />
+    <link rel="icon" href="/favicon.ico?v=hapisabela-mobile-3" type="image/x-icon" />
+
+    <!-- Supabase Configuration -->
+    <script src="/config.js?v=connection-1"></script>
+
+    <!-- Supabase JavaScript Library -->
+    <script defer src="/assets/js/notifications.js?v=popup-1"></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"
+    ></script>
+
+    <script defer src="/assets/js/vacancies.js?v=popup-1"></script>
+    <script defer src="/assets/js/password.js?v=popup-1"></script>
+    <script defer src="/assets/js/admin-users.js?v=popup-1"></script>
+    <script defer src="/assets/js/auth.js?v=popup-1"></script>
+    <script defer src="/assets/js/admin-dashboard.js?v=hapisabela-mobile-3"></script>
+    <script defer src="/assets/js/mobile.js?v=hapisabela-mobile-3"></script>
+    <script defer src="/assets/js/connection.js?v=connection-1"></script>
+    <script defer src="/job-seeker/profile.js?v=profile-1"></script>
+    <!-- Main Application Script -->
+    <script defer src="/assets/js/script.js?v=seeker-profile-1"></script>
+    <link rel="stylesheet" href="/assets/css/notifications.css?v=popup-1" />
+</head>
+
+  <body data-portal="seeker">
+    <div class="shell">
+      <!-- =========================================
+             APPLICATION LAYOUT
+        ========================================== -->
+
+      <!-- =========================================
+             MAIN APPLICATION
+        ========================================== -->
+      <div class="main">
+        <!-- =====================================
+                 TOP NAVIGATION BAR
+            ====================================== -->
+        <!-- seeker-partial: header -->
+
+        <!-- =====================================
+                 PAGE CONTENT
+            ====================================== -->
+        <main id="content">
+          <!-- ================================
+                     HOME / EXPLORE JOBS
+                ================================= -->
+          <!-- seeker-partial: home -->
+<!-- seeker-partial: fairs -->
+<!-- seeker-partial: training -->
+<!-- seeker-partial: advice -->
+<!-- seeker-partial: employers -->
+<!-- seeker-partial: resource-dialog -->
+
+<!-- seeker-partial: dashboard -->
+
+          <!-- ================================
+                     COMPANY / POST JOB
+                ================================= -->
+          <!-- seeker-partial: post -->
+
+          <!-- ================================
+                     APPLICATION MANAGEMENT
+                ================================= -->
+          <!-- seeker-partial: applications -->
+
+          <!-- ================================
+                     ADMINISTRATION
+                ================================= -->
+          <!-- seeker-partial: admin -->
+
+          <!-- ================================
+                     USER PROFILE
+                ================================= -->
+          <!-- seeker-partial: profile -->
+        </main>
+
+        <!-- =====================================
+                 FOOTER
+            ====================================== -->
+        <!-- seeker-partial: footer -->
+      </div>
+    </div>
+
+    <!-- =========================================
+         AUTHENTICATION MODAL
+    ========================================== -->
+    <!-- seeker-partial: auth-dialog -->
+
+
+
+
+
+
+
+
+    <!-- =========================================
+         JOB DETAILS MODAL
+    ========================================== -->
+    <!-- seeker-partial: add-user-dialog -->
+    <!-- seeker-partial: job-dialog -->
+
+    <!-- =========================================
+         JOB APPLICATION MODAL
+    ========================================== -->
+    <!-- seeker-partial: apply-dialog -->
+
+    <!-- =========================================
+         NOTIFICATION / TOAST
+    ========================================== -->
+    <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+  <!-- MOBILE APP SHELL -->
+<button id="installApp" type="button" class="install-app hidden">Install HapIsabela ↗</button>
+<nav id="mobileDock" class="mobile-dock" aria-label="Mobile navigation">
+  <button type="button" data-mobile-destination="discover" class="active" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/></svg><span>Discover</span></button>
+  <button type="button" data-mobile-destination="saved"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></svg><span>Saved</span></button>
+  <button type="button" data-mobile-destination="activity"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="4"/><path d="M9 5V3h6v2M8 11h8M8 16h5"/></svg><span id="mobileActivityLabel">Activity</span></button>
+  <button type="button" data-mobile-destination="account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg><span>Account</span></button>
+</nav>
+
+<!-- END MOBILE APP SHELL -->
+</body>
+</html>

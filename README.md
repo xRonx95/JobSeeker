@@ -23,6 +23,10 @@ isabela-careers-role-folders/
 
 ## Setup
 
+### Job seeker personal information
+
+Run [migrations/005-seeker-information.sql](migrations/005-seeker-information.sql) in the existing Supabase SQL Editor after migration 004, then deploy the updated files. The Personal information page has Personal information, Education, Family, and Background tabs with one atomic save. Additional records are owner-only; employer access to existing basic profile/application fields remains governed by the existing policies. Source files and rebuild instructions are in [job-seeker/README.md](job-seeker/README.md). The migration has not been applied automatically.
+
 ### Upgrade the existing portal
 
 1. Open the existing project's Supabase SQL Editor and run [migrations/002-career-portal.sql](migrations/002-career-portal.sql). It adds opportunity groups, saved jobs, career content, a public employer directory RPC, and the document attachment fix. It is safe to rerun. Do not rerun `schema.sql` on an existing database.
@@ -94,6 +98,8 @@ where id = 'REPLACE_WITH_AUTH_USER_UUID';
 ```
 
 ## Notes
+
+- **Action notifications:** `assets/js/notifications.js` and `assets/css/notifications.css` provide the shared, dismissible popup on every portal and password recovery page. Successful actions close open form dialogs; failed submissions keep their form open. Add user closes the creation form and shows email and a masked initial password in the success popup. Closing that popup removes its credentials from the DOM; they are never put in local/session storage. Plain login/logout messages can pass through a role redirect. Deploy the shared notification assets with all updated HTML pages.
 
 - **Mobile web app:** At widths up to 800px, HapIsabela uses a compact header, personalized greeting, pill search and category filters, rounded vacancy cards, bottom-sheet details, and a floating green navigation dock. Discover and Saved use the existing vacancy filters; Activity opens the appropriate seeker/company/admin workspace; Account opens Profile settings. Signed-out visitors are prompted to log in for private destinations. The mobile menu includes login/signup or logout.
 - **Home-screen installation:** Deploy `manifest.webmanifest`, `sw.js`, `offline.html`, and `assets/icons/` alongside the website over HTTPS. Supported browsers can install the site; an Install HapIsabela action appears in the mobile menu when the browser offers installation. Other supported browsers can use their own Add to Home Screen action. This is an installable web app, with the same accounts and database as the website.

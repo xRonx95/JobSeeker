@@ -15,17 +15,11 @@ html = html.replace(/<!-- MOBILE APP SHELL -->[\s\S]*?<!-- END MOBILE APP SHELL 
 html = html.replace('</body>',`<!-- MOBILE APP SHELL -->\n${mobileShell}\n<!-- END MOBILE APP SHELL -->\n</body>`);
 html = refreshAssets(html);
 fs.writeFileSync(path.join(root, 'index.html'), html);
-for (const [folder, role, title] of [
-  ['job-seeker', 'seeker', 'Job seeker dashboard'],
-]) {
-  fs.writeFileSync(path.join(root, folder, 'index.html'), html
-    .replace('data-portal="public"', `data-portal="${role}"`)
-    .replace('<title>HapIsabela | Local Job Portal</title>', `<title>${title} | HapIsabela</title>`));
-}
 for (const file of ['reset-password.html','privacy.html','terms.html']) {
   const location = path.join(root,file);
   fs.writeFileSync(location,refreshAssets(fs.readFileSync(location,'utf8')));
 }
 require('./build-admin.cjs')();
 require('./build-company.cjs')();
-console.log('Updated the seeker portal; assembled the independent admin and company portals.');
+require('./build-seeker.cjs')();
+console.log('Updated shared public components and assembled all three independent portals.');

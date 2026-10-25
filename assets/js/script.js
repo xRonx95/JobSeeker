@@ -36,14 +36,11 @@
   }
   const err = (e) => toast(errorMessage(e), "error");
   const toast = (s, type = "") => {
-    const t = $("#toast");
-    t.textContent = s;
-    t.className = "toast " + type;
-    clearTimeout(window.__toastTimer);
-    window.__toastTimer = setTimeout(() => t.classList.add("hidden"), 5000);
+    window.IsabelaNotifications.show(s, {type:type || 'success'});
   };
   let sb = null,
     authUI = null,
+    seekerProfileUI = null,
     user = null,
     profile = null,
     jobs = [],
@@ -75,6 +72,7 @@
     }
     const route = routeForRole();
     if (pageRole !== profile.role) {
+      window.IsabelaNotifications.carryToNextPage();
       location.replace(route);
       return true;
     }
@@ -317,6 +315,8 @@
       user = null;
       profile = null;
       redrawNav();
+      toast('You have logged out successfully.');
+      window.IsabelaNotifications.carryToNextPage();
       location.replace("/");
     } catch (e) {
       err(e);
@@ -442,10 +442,18 @@
         "hidden",
         profile.role !== "company",
       );
+      if (pageRole === 'seeker') {
+        seekerProfileUI ||= window.IsabelaSeekerProfile.create({client:sb,user:()=>user,notify:toast});
+        await seekerProfileUI.load();
+      }
     }
   }
   async function submitProfile(e) {
     e.preventDefault();
+    if (pageRole === 'seeker') {
+      if (await seekerProfileUI?.save()) await loadProfile().catch(() => toast('Your information was saved. Reopen your profile to refresh account details.'));
+      return;
+    }
     const f = new FormData(e.target);
     try {
       await q(
