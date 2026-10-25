@@ -1,0 +1,1 @@
+{"name":"hapisabela","private":true,"scripts":{"build":"node scripts/build-admin.cjs && node scripts/build-company.cjs && node scripts/build-seeker.cjs","test":"node --test tests/*.test.cjs tests/*.test.mjs","test:database":"node tests/database-integration.mjs","test:browser":"node tests/browser-review.cjs"},"devDependencies":{"@electric-sql/pglite":"^0.5.11"}}

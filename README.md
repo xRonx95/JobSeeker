@@ -27,6 +27,8 @@ isabela-careers-role-folders/
 
 Run [migrations/005-seeker-information.sql](migrations/005-seeker-information.sql) in the existing Supabase SQL Editor after migration 004, then deploy the updated files. The Personal information page has Personal information, Education, Family, and Background tabs with one atomic save. Additional records are owner-only; employer access to existing basic profile/application fields remains governed by the existing policies. Source files and rebuild instructions are in [job-seeker/README.md](job-seeker/README.md). The migration has not been applied automatically.
 
+Then apply [migrations/006-applicant-information-access.sql](migrations/006-applicant-information-access.sql) to enable **View personal information** in employer and administrator application tables. The read RPC validates the application ID against the active reviewing company’s job ownership or active administrator role. It returns the applicant’s current information, including education, family, and background; it does not store a historical snapshot at submission. The application form and personal information page explain this sharing. These SQL changes must be applied separately from deploying the source files.
+
 ### Upgrade the existing portal
 
 1. Open the existing project's Supabase SQL Editor and run [migrations/002-career-portal.sql](migrations/002-career-portal.sql). It adds opportunity groups, saved jobs, career content, a public employer directory RPC, and the document attachment fix. It is safe to rerun. Do not rerun `schema.sql` on an existing database.

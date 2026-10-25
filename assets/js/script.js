@@ -41,6 +41,8 @@
   let sb = null,
     authUI = null,
     seekerProfileUI = null,
+    applicationUI = null,
+    workflowUI = null,
     user = null,
     profile = null,
     jobs = [],
@@ -143,6 +145,7 @@
     `<div class="note">${message}</div>${!user ? '<button class="btn" data-auth="login">Log in</button>' : ""}`;
   function redrawNav() {
     mobileUI.update();
+    workflowUI?.update();
     const role = profile?.role;
     $("#signedInAs").textContent = user
       ? `${profile?.full_name || user.email} · ${role || "Member"}`
@@ -236,74 +239,9 @@
     $("#requiredFiles").innerHTML =
       "<strong>Employer requirements</strong>" + reqList(j.requirements);
     $("#applyDialog").showModal();
+    applicationUI.prepare(j);
   }
-  async function submitApplication(e) {
-    e.preventDefault();
-    if (!isSeeker()) return toast("Job Seeker account required.", "error");
-    const btn = e.target.querySelector('[type="submit"]');
-    const fileList = [...$("#documentsInput").files];
-    if (!fileList.length)
-      return toast("Please attach at least one required document.", "error");
-    const allowed = [
-      "application/pdf",
-      "image/png",
-      "image/jpeg",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    ];
-    if (fileList.length > 12) return toast("Maximum 12 documents.", "error");
-    if (
-      fileList.some(
-        (f) => f.size > 5 * 1024 * 1024 || !allowed.includes(f.type),
-      )
-    )
-      return toast("Only PDF, JPG, PNG, and DOCX under 5 MB each.", "error");
-    btn.disabled = true;
-    let appId = null;
-    try {
-      const row = await q(
-        sb
-          .from("applications")
-          .insert({
-            job_id: $("#applyJobId").value,
-            seeker_id: user.id,
-            cover_letter: new FormData(e.target).get("cover_letter") || "",
-          })
-          .select("id")
-          .single(),
-      );
-      appId = row.id;
-      let uploaded = 0;
-      for (const f of fileList) {
-        const ext = (f.name.split(".").pop() || "pdf").toLowerCase();
-        const path = `${user.id}/${appId}/${crypto.randomUUID()}.${ext}`;
-        await q(
-          sb.storage
-            .from("application-documents")
-            .upload(path, f, { contentType: f.type, upsert: false }),
-        );
-        await q(
-          sb.rpc("attach_application_document", {
-            p_application: appId,
-            p_path: path,
-          }),
-        );
-        uploaded++;
-      }
-      $("#applyDialog").close();
-      toast(`Application submitted with ${uploaded} document(s).`);
-      await loadJobs();
-      go("applications");
-    } catch (e) {
-      err(e);
-      if (appId)
-        toast(
-          "An application record may have been created. Check Applications before retrying.",
-          "error",
-        );
-    } finally {
-      btn.disabled = false;
-    }
-  }
+  async function submitApplication(e) {e.preventDefault();if(!isSeeker())return toast('An active Job Seeker account is required.','error');return applicationUI.submit();}
   function showAuth(mode = "login") {
     if (!authUI) return toast("The login service is loading. Please try again.", "error");
     closeNavigation();
@@ -330,6 +268,7 @@
     if (currentView === "applications") return applications();
     if (currentView === "admin") return admin();
     if (currentView === "profile") return profilePage();
+    if (currentView === "workflow") return workflowUI.render();
   }
   const table = (headers, rows) =>
     `<div class="table-wrap"><table><thead><tr>${headers.map((x) => `<th>${x}</th>`).join("")}</tr></thead><tbody>${rows || '<tr><td colspan="8">No records yet.</td></tr>'}</tbody></table></div>`;
@@ -529,7 +468,7 @@
     const rows = await Promise.all(
       apps.map(
         async (a) =>
-          `<tr><td><strong>${esc(a.jobs?.title || "Job")}</strong>${!isSeeker() ? `<small>${esc(a.profiles?.full_name || "Applicant")} · ${esc(a.profiles?.email || "")} · ${esc(a.profiles?.phone || "")}</small>` : `<small>${esc(a.jobs?.company_name || "Employer")}</small>`}</td><td>${badge(a.status)}</td><td>${fmt(a.created_at)}</td><td><div class="prewrap">${esc(a.cover_letter || "—")}</div></td><td>${await docLinks(a.document_paths)}</td><td>${!isSeeker() ? `<select aria-label="Application status" data-application-status="${a.id}">${["submitted", "reviewing", "shortlisted", "rejected", "hired"].map((s) => `<option ${s === a.status ? "selected" : ""}>${s}</option>`).join("")}</select>` : "—"}</td></tr>`,
+          `<tr><td><strong>${esc(a.jobs?.title || "Job")}</strong>${!isSeeker() ? `<small>${esc(a.profiles?.full_name || "Applicant")} · ${esc(a.profiles?.email || "")} · ${esc(a.profiles?.phone || "")}</small><button type="button" class="mini" data-applicant-profile="${esc(a.id)}">View personal information</button>` : `<small>${esc(a.jobs?.company_name || "Employer")}</small>`}</td><td>${badge(a.status)}</td><td>${fmt(a.created_at)}</td><td><div class="prewrap">${esc(a.cover_letter || "—")}</div></td><td>${await docLinks(a.document_paths)}</td><td>${!isSeeker() ? `<select aria-label="Application status" data-application-status="${a.id}">${["submitted", "reviewing", "shortlisted", "rejected", "hired"].map((s) => `<option ${s === a.status ? "selected" : ""}>${s}</option>`).join("")}</select>` : "—"}</td></tr>`,
       ),
     );
     $("#applicationsContent").innerHTML = table(
@@ -560,12 +499,12 @@
     try {
       if (kind === "profileStatus")
         await q(
-          sb.rpc("admin_set_profile_status", { p_id: id, p_status: status }),
+          sb.rpc('admin_set_profile_status',{p_id:id,p_status:status}),
         );
       if (kind === "jobStatus")
-        await q(sb.rpc("admin_set_job_status", { p_id: id, p_status: status }));
+        await q(sb.rpc('workflow_action',{p_action:'moderate_job',p_id:id,p_data:{status,reason:prompt('Moderation reason')||''}}));
       if (kind === "applicationStatus")
-        await q(sb.from("applications").update({ status }).eq("id", id));
+        await q(sb.rpc('workflow_action',{p_action:'application_status',p_id:id,p_data:{status,reason:status==='rejected'?prompt('Reason for rejection')||'':''}}));
       toast("Status updated.");
       await loadJobs();
       await renderView();
@@ -602,6 +541,9 @@
         proxy: window.ISABELA_SUPABASE_PROXY,
       }) } },
     );
+    window.IsabelaApplicantProfiles.bind({client:()=>sb,canView:()=>isAdmin()||isCompany(),esc});
+    applicationUI=window.HapApplication.create({client:()=>sb,user:()=>user,notify:toast,done:async()=>{await loadJobs();go('applications');}});
+    workflowUI=window.HapWorkflow.create({client:()=>sb,user:()=>user,profile:()=>profile,go,notify:toast,esc,refresh:async()=>{await loadProfile();await renderView();}});
     window.IsabelaPassword.bind(sb);
     authUI = window.IsabelaAuth.bind({ client: sb, signedIn: async account => {
       user = account;
@@ -615,6 +557,7 @@
     const { data, error } = await sb.auth.getUser();
     if (error && error.name !== "AuthSessionMissingError") throw error;
     user = data?.user || null;
+    if(user)await window.HapPolicies.ensureSession(sb);
     if (user) await loadProfile();
     else redrawNav();
     if (enforceRoleRoute()) return;

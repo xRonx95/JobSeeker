@@ -14,9 +14,10 @@
     <label>Password<input name="password" id="authPassword" type="password" autocomplete="current-password" placeholder="Password" minlength="8" maxlength="128" required /></label>
     <div id="signupExtras" class="hidden">
       <label>Phone number (optional)<input name="phone" id="registerPhone" type="tel" autocomplete="tel" maxlength="50" placeholder="+63 Phone number" disabled /></label>
-      <label class="consent-label"><input type="checkbox" id="signupConsent" disabled /><span>I agree to the <a href="/privacy.html" target="_blank" rel="noopener">Privacy Notice</a> and <a href="/terms.html" target="_blank" rel="noopener">Terms of Use</a>.</span></label>
+
     </div>
-    <button id="authSubmit" class="btn block auth-submit" type="submit">Log in</button>
+    <fieldset class="policy-acknowledgments"><legend id="authAgreementTitle">HapIsabela ? Sign In Agreement</legend><p id="authAgreementIntro">Review our Terms and Privacy Notice. Keep your account credentials confidential.</p><p id="authPolicyVersions" role="status"></p><label class="consent-label"><input type="checkbox" id="signupConsent" required /><span>I have read and agree to the <a href="/terms.html" target="_blank" rel="noopener">Terms and Conditions</a>.</span></label><label class="consent-label"><input type="checkbox" id="privacyAcknowledgment" required /><span>I acknowledge that I have read the <a href="/privacy.html" target="_blank" rel="noopener">Privacy Notice</a>.</span></label><label class="consent-label hidden" id="employerAcknowledgmentField"><input type="checkbox" id="employerAcknowledgment" /><span>I am authorized to register this company and have read the <a href="/employer-policy.html" target="_blank" rel="noopener">Employer Responsibilities</a>.</span></label><label class="consent-label hidden" id="optionalAlertsField"><input type="checkbox" id="optionalAlerts" /><span>I would like optional job alerts or promotional updates.</span></label></fieldset>
+    <button id="authSubmit" disabled class="btn block auth-submit" type="submit">Log in</button>
     <a id="authForgot" href="/reset-password.html" class="auth-forgot">Forgot your password?</a>
     <p id="authSwitchPrompt">Don't have an account yet?</p>
     <button id="toggleAuth" class="auth-switch" type="button">Create an account · Sign up</button>

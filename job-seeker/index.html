@@ -28,7 +28,7 @@
     <link rel="icon" href="/favicon.ico?v=hapisabela-mobile-3" type="image/x-icon" />
 
     <!-- Supabase Configuration -->
-    <script src="/config.js?v=connection-1"></script>
+    <script src="/config.js?v=workflow-1"></script>
 
     <!-- Supabase JavaScript Library -->
     <script defer src="/assets/js/notifications.js?v=popup-1"></script>
@@ -37,17 +37,23 @@
       src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"
     ></script>
 
-    <script defer src="/assets/js/vacancies.js?v=popup-1"></script>
+    <script defer src="/assets/js/vacancies.js?v=workflow-1"></script>
     <script defer src="/assets/js/password.js?v=popup-1"></script>
     <script defer src="/assets/js/admin-users.js?v=popup-1"></script>
-    <script defer src="/assets/js/auth.js?v=popup-1"></script>
-    <script defer src="/assets/js/admin-dashboard.js?v=hapisabela-mobile-3"></script>
+    <script defer src="/assets/js/auth.js?v=workflow-1"></script>
+    <script defer src="/assets/js/admin-dashboard.js?v=workflow-1"></script>
     <script defer src="/assets/js/mobile.js?v=hapisabela-mobile-3"></script>
     <script defer src="/assets/js/connection.js?v=connection-1"></script>
     <script defer src="/job-seeker/profile.js?v=profile-1"></script>
+    <script defer src="/assets/js/applicant-profiles.js?v=workflow-1"></script>
+    <script defer src="/assets/js/policies.js?v=workflow-1"></script>
+    <script defer src="/assets/js/application-workflow.js?v=workflow-1"></script>
+    <script defer src="/assets/js/workflow.js?v=workflow-1"></script>
     <!-- Main Application Script -->
-    <script defer src="/assets/js/script.js?v=seeker-profile-1"></script>
+    <script defer src="/assets/js/script.js?v=workflow-1"></script>
     <link rel="stylesheet" href="/assets/css/notifications.css?v=popup-1" />
+  <link rel="stylesheet" href="/assets/css/applicant-profiles.css?v=applicants-1" />
+  <link rel="stylesheet" href="/assets/css/workflow.css?v=workflow-1" />
 </head>
 
   <body data-portal="seeker">
@@ -299,7 +305,7 @@
 <button type="button" id="tab-education" role="tab" aria-selected="false" aria-controls="panel-education" tabindex="-1" data-profile-tab="education">Education</button>
 <button type="button" id="tab-family" role="tab" aria-selected="false" aria-controls="panel-family" tabindex="-1" data-profile-tab="family">Family</button>
 <button type="button" id="tab-background" role="tab" aria-selected="false" aria-controls="panel-background" tabindex="-1" data-profile-tab="background">Background</button></div>
-<p class="seeker-profile-note">Additional details are optional. Education, family, and background information is private to your account.</p><p id="seekerProfileStatus" role="status" aria-live="polite"></p>
+<p class="seeker-profile-note">Additional details are optional. Applications preserve a recruitment-related snapshot. Family details and unrelated sensitive characteristics remain private and are not included in new submissions.</p><p id="seekerProfileStatus" role="status" aria-live="polite"></p>
 <section id="panel-personal" role="tabpanel" aria-labelledby="tab-personal" ><h2>Personal details</h2><p>Keep your contact information current.</p><div class="form-grid">
     <label>Full name *<input name="full_name" type="text" maxlength="120" required  /></label>
     <label>Phone number<input name="phone" type="tel" maxlength="50"   /></label>
@@ -355,7 +361,7 @@
         <footer class="footer">
           HapIsabela · An independent employment portal concept · Please
           verify employers and never pay to apply.
-        </footer>
+        <nav class="policy-footer" aria-label="Policies"><a href="/terms.html">Terms</a><a href="/privacy.html">Privacy Notice</a><a href="/application-policy.html">Application Agreement</a><a href="/employer-policy.html">Employer Responsibilities</a><a href="/privacy-request.html">Privacy requests</a></nav></footer>
       </div>
     </div>
 
@@ -365,7 +371,7 @@
     <dialog id="authDialog" class="modal auth-card" aria-labelledby="authTitle">
   <form id="authForm" class="dialog-body auth-card-body">
     <button type="button" class="close auth-close" data-close="authDialog" aria-label="Close authentication dialog">×</button>
-    <img src="/favicon.ico?v=hapisabela-mobile-3" alt="HapIsabela logo" class="auth-logo" width="112" height="112" />
+    <img src="/favicon.ico" alt="HapIsabela logo" class="auth-logo" width="112" height="112" />
     <p class="auth-brand-name">HapIsabela</p>
     <h2 id="authTitle">Log in to HapIsabela</h2>
     <p id="authSubtitle">Your next opportunity starts here.</p>
@@ -378,9 +384,10 @@
     <label>Password<input name="password" id="authPassword" type="password" autocomplete="current-password" placeholder="Password" minlength="8" maxlength="128" required /></label>
     <div id="signupExtras" class="hidden">
       <label>Phone number (optional)<input name="phone" id="registerPhone" type="tel" autocomplete="tel" maxlength="50" placeholder="+63 Phone number" disabled /></label>
-      <label class="consent-label"><input type="checkbox" id="signupConsent" disabled /><span>I agree to the <a href="/privacy.html" target="_blank" rel="noopener">Privacy Notice</a> and <a href="/terms.html" target="_blank" rel="noopener">Terms of Use</a>.</span></label>
+
     </div>
-    <button id="authSubmit" class="btn block auth-submit" type="submit">Log in</button>
+    <fieldset class="policy-acknowledgments"><legend id="authAgreementTitle">HapIsabela ? Sign In Agreement</legend><p id="authAgreementIntro">Review our Terms and Privacy Notice. Keep your account credentials confidential.</p><p id="authPolicyVersions" role="status"></p><label class="consent-label"><input type="checkbox" id="signupConsent" required /><span>I have read and agree to the <a href="/terms.html" target="_blank" rel="noopener">Terms and Conditions</a>.</span></label><label class="consent-label"><input type="checkbox" id="privacyAcknowledgment" required /><span>I acknowledge that I have read the <a href="/privacy.html" target="_blank" rel="noopener">Privacy Notice</a>.</span></label><label class="consent-label hidden" id="employerAcknowledgmentField"><input type="checkbox" id="employerAcknowledgment" /><span>I am authorized to register this company and have read the <a href="/employer-policy.html" target="_blank" rel="noopener">Employer Responsibilities</a>.</span></label><label class="consent-label hidden" id="optionalAlertsField"><input type="checkbox" id="optionalAlerts" /><span>I would like optional job alerts or promotional updates.</span></label></fieldset>
+    <button id="authSubmit" disabled class="btn block auth-submit" type="submit">Log in</button>
     <a id="authForgot" href="/reset-password.html" class="auth-forgot">Forgot your password?</a>
     <p id="authSwitchPrompt">Don't have an account yet?</p>
     <button id="toggleAuth" class="auth-switch" type="button">Create an account · Sign up</button>
@@ -444,6 +451,7 @@
          JOB APPLICATION MODAL
     ========================================== -->
     <dialog id="applyDialog" class="modal wide">
+      <p class="application-sharing-note">When you apply, your recruitment-related profile snapshot and selected documents are shared with the named employer and authorized administrators. Family details and unrelated sensitive characteristics are excluded from new submissions.</p>
       <form id="applyForm" class="dialog-body">
         <button
           type="button"

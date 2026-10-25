@@ -49,7 +49,7 @@ async function main(){
   ws=new WebSocket(tabs.find(x=>x.type==='page').webSocketDebuggerUrl);
   await new Promise((resolve,reject)=>{ws.onopen=resolve;ws.onerror=reject;});
   let seq=0;const pending=new Map(),errors=[];
-  let mockRole='admin', saved=[], content=[], passwordUpdates=0, resetRequests=[], signupRequests=[], failStartup=false, proxyRequests=0, seekerInformation=null, failSeekerSave=false;
+  let mockRole='admin', saved=[], content=[], passwordUpdates=0, resetRequests=[], signupRequests=[], failStartup=false, proxyRequests=0, seekerInformation=null, failSeekerSave=false, denyApplicant=false;
   const mockUser={id:'00000000-0000-4000-8000-000000000001',email:'review@example.test',app_metadata:{provider:'email'},user_metadata:{},aud:'authenticated',created_at:'2026-01-01T00:00:00Z'};
   function send(method,params={}){return new Promise((resolve,reject)=>{const id=++seq;pending.set(id,{resolve,reject});ws.send(JSON.stringify({id,method,params}));});}
   const jobs=Array.from({length:23},(_,i)=>({id:`job-${i}`,company_id:i%2?'b':'a',title:i%2?'Office Assistant':'Software Developer',company_name:i%2?'Basilan Community Services':'Isabela Technology Group',location:'Isabela City, Basilan',category:i%2?'Administration':'Information Technology',employment_type:'Full-time',description:'An opportunity to grow your career in the local community.',qualifications:'Communication and teamwork skills.',requirements:['Resume'],audiences:i%2?['pwd','high-school']:[],salary:i%2?'₱18,000–₱22,000 / month':null,status:'approved',created_at:new Date(Date.UTC(2026,9,20-i)).toISOString()}));
@@ -72,6 +72,10 @@ async function main(){
       if(url.pathname==='/rest/v1/profiles'){
         const profile={id:mockUser.id,email:mockUser.email,full_name:'Review account',company_name:'Review employer',role:mockRole,approval_status:'active'};
         data=url.searchParams.has('id')?profile:[profile,...fixtureProfiles,...createdAccounts];
+      }
+      if(url.pathname==='/rest/v1/rpc/get_application_seeker_information'){
+        if(denyApplicant||mockRole==='seeker'){await send('Fetch.fulfillRequest',{requestId,responseCode:403,responseHeaders:[{name:'Content-Type',value:'application/json'}],body:Buffer.from(JSON.stringify({message:'You do not have permission to view this applicant',code:'42501'})).toString('base64')});return;}
+        data={full_name:'Review applicant',email:'applicant@example.test',phone:'09000000000',location:'Isabela City',bio:'Career summary',personal:{nationality:'Filipino'},education:{school:'Isabela College'},family:{emergency_name:'Emergency Contact'},background:{skills:'<img src=x onerror=alert(1)>'}};
       }
       if(url.pathname==='/rest/v1/seeker_information')data=seekerInformation?[seekerInformation]:[];
       if(url.pathname==='/rest/v1/rpc/save_my_seeker_information'){
@@ -230,6 +234,14 @@ async function main(){
   await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
   assert.equal(await evaluate('document.documentElement.scrollWidth<=window.innerWidth'),true,'Admin records overflow the mobile page');
   await send('Emulation.setDeviceMetricsOverride',{width:1365,height:1000,deviceScaleFactor:1,mobile:false});
+  await evaluate("document.querySelector('#adminContent [data-applicant-profile]').click()");
+  await until("document.querySelector('#applicantProfileBody').textContent.includes('Isabela College')");
+  assert.equal(await evaluate("document.querySelector('#applicantProfileDialog').open"),true);
+  assert.match(await evaluate("document.querySelector('#applicantProfileBody').textContent"),/Emergency Contact/);
+  assert.equal(await evaluate("document.querySelector('#applicantProfileBody img')===null"),true,'Applicant information rendered unsafe HTML');
+  const applicantShot=await send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(output,'applicant-information.png'),Buffer.from(applicantShot.data,'base64'));
+  await evaluate("document.querySelector('#applicantProfileDialog').close()");
+  await until("document.querySelector('#applicantProfileBody').textContent===''");
   const adminPaginationShot=await send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(output,'admin-pagination.png'),Buffer.from(adminPaginationShot.data,'base64'));
   await evaluate("document.querySelector('[data-view=\"applications\"]').click()");
   await until("document.querySelector('#applicationsContent .admin-pagination')?.textContent.includes('of 527')");
@@ -293,6 +305,18 @@ async function main(){
   await evaluate("document.querySelector('[data-view=\"applications\"]').click()");
   await until("document.querySelector('#applicationsContent table')!==null");
   assert.equal(await evaluate('document.documentElement.scrollWidth<=window.innerWidth'),true,'Company applications overflow');
+  await evaluate("document.querySelector('#applicationsContent [data-applicant-profile]').click()");
+  await until("document.querySelector('#applicantProfileBody').textContent.includes('Isabela College')");
+  assert.match(await evaluate("document.querySelector('#applicantProfileBody').textContent"),/Filipino/);
+  await evaluate("document.querySelector('#applicantProfileDialog').close()");
+  await until("document.querySelector('#applicantProfileBody').textContent===''");
+  denyApplicant=true;
+  await evaluate("document.querySelector('#applicationsContent [data-applicant-profile]').click()");
+  await until("document.querySelector('#applicantProfileBody').textContent.includes('do not have permission')");
+  assert.equal(await evaluate("document.querySelector('#applicantProfileBody').textContent.includes('Isabela College')"),false,'Denied request retained applicant details');
+  denyApplicant=false;
+  await evaluate("document.querySelector('#applicantProfileDialog').close()");
+
   await send('Emulation.setDeviceMetricsOverride',{width:1365,height:1000,deviceScaleFactor:1,mobile:false});
   mockRole='seeker';
   await send('Page.navigate',{url:base+'/job-seeker/'});

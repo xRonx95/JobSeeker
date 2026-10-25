@@ -1,0 +1,67 @@
+begin;
+create table if not exists public.system_settings(key text primary key,value jsonb not null default '{}');
+insert into public.system_settings(key) values('operator') on conflict do nothing;
+create table if not exists public.policy_documents(id uuid primary key default gen_random_uuid(),policy_type text not null check(policy_type in('terms','privacy','application','employer')),version text not null,title text not null,content text not null check(length(content) between 100 and 60000),effective_at timestamptz not null default now(),published_at timestamptz,is_active boolean not null default false,created_at timestamptz not null default now(),unique(policy_type,version));
+create unique index if not exists policy_one_active on public.policy_documents(policy_type) where is_active;
+create table if not exists public.policy_acceptances(id uuid primary key default gen_random_uuid(),user_id uuid not null references auth.users(id),policy_document_id uuid not null references public.policy_documents(id),action_type text not null check(action_type in('signup','signin','employer_registration')),session_id text,accepted_at timestamptz not null default now(),agreement_method text not null default 'explicit_checkbox',created_at timestamptz not null default now());
+create unique index if not exists policy_session_receipt on public.policy_acceptances(user_id,policy_document_id,action_type,session_id) where session_id is not null;
+create table if not exists public.notifications(id uuid primary key default gen_random_uuid(),user_id uuid not null references auth.users(id),kind text not null,message text not null,entity_id uuid,read_at timestamptz,created_at timestamptz not null default now());
+create index if not exists notification_owner on public.notifications(user_id,created_at desc);
+create table if not exists public.audit_logs(id uuid primary key default gen_random_uuid(),actor_id uuid,action text not null,entity_id uuid,details jsonb not null default '{}',created_at timestamptz not null default now());
+create table if not exists public.job_alerts(user_id uuid primary key references auth.users(id),enabled boolean not null default false,preferences jsonb not null default '{}',updated_at timestamptz not null default now());
+create or replace function public.current_policy(p_type text) returns uuid language sql stable security definer set search_path='' as $$select id from public.policy_documents where policy_type=p_type and is_active and published_at is not null and effective_at<=now()$$;
+create or replace function public.has_current_session_ack() returns boolean language sql stable security definer set search_path='' as $$select auth.uid() is not null and nullif(auth.jwt()->>'session_id','') is not null and not exists(select t from unnest(array['terms','privacy']) t where public.current_policy(t) is null or not exists(select 1 from public.policy_acceptances a where a.user_id=auth.uid() and a.session_id=auth.jwt()->>'session_id' and a.policy_document_id=public.current_policy(t) and a.action_type='signin'))$$;
+create or replace function public.require_workflow_access() returns void language plpgsql stable security definer set search_path='' as $$begin if not exists(select 1 from public.profiles where id=auth.uid() and approval_status='active') or not public.has_current_session_ack() then raise exception 'Review the current Terms and Privacy Notice and sign in as an active account' using errcode='42501';end if;end$$;
+create or replace function public.immutable_workflow_record() returns trigger language plpgsql set search_path='' as $$begin raise exception 'Historical records are immutable';end$$;
+create or replace function public.protect_published_policy() returns trigger language plpgsql set search_path='' as $$begin if old.published_at is not null and (new.content,new.version,new.policy_type,new.effective_at,new.title,new.published_at) is distinct from (old.content,old.version,old.policy_type,old.effective_at,old.title,old.published_at) then raise exception 'Publish a new version; historical policy text is immutable';end if;return new;end$$;
+drop trigger if exists protect_policy_text on public.policy_documents;
+create trigger protect_policy_text before update on public.policy_documents for each row execute function public.protect_published_policy();
+drop trigger if exists immutable_receipts on public.policy_acceptances;
+create trigger immutable_receipts before update or delete on public.policy_acceptances for each row execute function public.immutable_workflow_record();
+drop trigger if exists immutable_audit on public.audit_logs;
+create trigger immutable_audit before update or delete on public.audit_logs for each row execute function public.immutable_workflow_record();
+create or replace function public.accept_current_policies(p_action text,p_ids uuid[],p_optional_alerts boolean default false) returns void language plpgsql security definer set search_path='' as $$declare k text;begin
+if auth.uid() is null or nullif(auth.jwt()->>'session_id','') is null or p_action not in('signin','employer_registration') then raise exception 'Authenticated session required' using errcode='42501';end if;
+foreach k in array case when p_action='employer_registration' then array['terms','privacy','employer'] else array['terms','privacy'] end loop
+if public.current_policy(k) is null or not public.current_policy(k)=any(p_ids) then raise exception 'Explicit acknowledgment of current policy versions required';end if;
+insert into public.policy_acceptances(user_id,policy_document_id,action_type,session_id) values(auth.uid(),public.current_policy(k),p_action,auth.jwt()->>'session_id') on conflict do nothing;end loop;
+if p_optional_alerts then insert into public.job_alerts(user_id,enabled) values(auth.uid(),true) on conflict(user_id) do update set enabled=true,updated_at=now();end if;end$$;
+create or replace function public.record_signup_policies() returns trigger language plpgsql security definer set search_path='' as $$declare k text;ids jsonb;begin
+if coalesce(new.raw_app_meta_data->>'portal_created_by_admin','false')='true' then return new;end if;
+ids:=coalesce(new.raw_user_meta_data->'policy_ids','[]'::jsonb);
+if new.raw_user_meta_data->>'terms_ack' is distinct from 'true' or new.raw_user_meta_data->>'privacy_ack' is distinct from 'true' then raise exception 'Registration acknowledgments required';end if;
+if new.raw_user_meta_data->>'requested_role'='company' and new.raw_user_meta_data->>'employer_ack' is distinct from 'true' then raise exception 'Employer authorization acknowledgment required';end if;
+foreach k in array case when new.raw_user_meta_data->>'requested_role'='company' then array['terms','privacy','employer'] else array['terms','privacy'] end loop
+if public.current_policy(k) is null or not ids @> to_jsonb(array[public.current_policy(k)::text]) then raise exception 'Current registration policy versions required';end if;
+insert into public.policy_acceptances(user_id,policy_document_id,action_type) values(new.id,public.current_policy(k),case when k='employer' then 'employer_registration' else 'signup' end);end loop;
+insert into public.notifications(user_id,kind,message) values(new.id,'registration','Registration received. Employer posting requires portal approval.');
+if new.raw_user_meta_data->>'optional_alerts'='true' then insert into public.job_alerts(user_id,enabled) values(new.id,true);end if;return new;end$$;
+drop trigger if exists zz_record_signup_policies on auth.users;
+create trigger zz_record_signup_policies after insert on auth.users for each row execute function public.record_signup_policies();
+create or replace function public.publish_policy(p_type text,p_version text,p_title text,p_content text,p_operator jsonb,p_reviewed boolean) returns uuid language plpgsql security definer set search_path='' as $$declare rid uuid;k text;begin
+if not public.is_admin() then raise exception 'Administrator required' using errcode='42501';end if;
+if not coalesce(p_reviewed,false) or p_content ~* '(TO BE CONFIRMED|\[CONFIRM|DRAFT|PLACEHOLDER)' then raise exception 'Complete and legally review policy text before publication';end if;
+foreach k in array array['legal_name','address','support_email','privacy_contact','retention','processing_bases'] loop if length(trim(coalesce(p_operator->>k,'')))<3 then raise exception 'Confirm operator field: %',k;end if;end loop;
+if p_operator->>'support_email' !~ '^[^[:space:]@]+@[^[:space:]@]+\.[^[:space:]@]+$' then raise exception 'Valid support email required';end if;
+update public.policy_documents set is_active=false where policy_type=p_type and is_active;
+insert into public.policy_documents(policy_type,version,title,content,effective_at,published_at,is_active) values(p_type,p_version,p_title,p_content,now(),now(),true) returning id into rid;
+insert into public.system_settings(key,value) values('operator',p_operator) on conflict(key) do update set value=excluded.value;
+insert into public.audit_logs(actor_id,action,entity_id) values(auth.uid(),'policy_published',rid);return rid;end$$;
+do $$declare t text;begin foreach t in array array['system_settings','policy_documents','policy_acceptances','notifications','audit_logs','job_alerts'] loop execute format('alter table public.%I enable row level security',t);execute format('revoke all on public.%I from anon,authenticated',t);execute format('grant select on public.%I to authenticated',t);end loop;end$$;
+grant select on public.policy_documents to anon;
+drop policy if exists policy_read on public.policy_documents;
+create policy policy_read on public.policy_documents for select to anon,authenticated using(published_at is not null or public.is_admin());
+drop policy if exists operator_admin on public.system_settings;
+create policy operator_admin on public.system_settings for select to authenticated using(public.is_admin());
+drop policy if exists receipts_owner on public.policy_acceptances;
+create policy receipts_owner on public.policy_acceptances for select to authenticated using(user_id=auth.uid() or public.is_admin());
+drop policy if exists inbox_owner on public.notifications;
+create policy inbox_owner on public.notifications for select to authenticated using(user_id=auth.uid());
+drop policy if exists audit_admin on public.audit_logs;
+create policy audit_admin on public.audit_logs for select to authenticated using(public.is_admin());
+drop policy if exists alerts_owner on public.job_alerts;
+create policy alerts_owner on public.job_alerts for select to authenticated using(user_id=auth.uid());
+revoke all on function public.current_policy(text),public.has_current_session_ack(),public.require_workflow_access(),public.accept_current_policies(text,uuid[],boolean),public.publish_policy(text,text,text,text,jsonb,boolean) from public,anon,authenticated;
+grant execute on function public.current_policy(text) to anon,authenticated;
+grant execute on function public.has_current_session_ack(),public.require_workflow_access(),public.accept_current_policies(text,uuid[],boolean),public.publish_policy(text,text,text,text,jsonb,boolean) to authenticated;
+commit;
