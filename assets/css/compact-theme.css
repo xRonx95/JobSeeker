@@ -1,4 +1,9 @@
 /* Final shared sizing layer. Keep this after page-specific stylesheets. */
+.connection-screen {max-width:560px;margin:70px auto;padding:28px;background:#fff;border:1px solid #dfe7df;border-radius:6px;}
+.connection-screen[hidden] {display:none;}
+.connection-screen a {display:inline-block;margin:16px;font-size:13px;color:#34684a;}
+.portal-connecting #content,.portal-connecting .primary-nav,.portal-connecting .top-actions {display:none!important;}
+@media(max-width:600px){.connection-screen{margin:35px 20px;}}
 body[data-portal] {font-size:14px;line-height:1.55;}
 body[data-portal] h1,body[data-portal] h2,body[data-portal] h3,body[data-portal] h4,body[data-portal] button,body[data-portal] input,body[data-portal] select,body[data-portal] textarea {font-family:"Segoe UI",Arial,sans-serif;}
 body[data-portal] h1 {font-size:28px;line-height:1.25;font-weight:600;letter-spacing:-.6px;}

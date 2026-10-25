@@ -3,7 +3,16 @@
   "functions": {
     "api/admin/users.mjs": { "maxDuration": 60 }
   },
+  "rewrites": [
+    { "source": "/supabase/auth/:path*", "destination": "https://hderthposugfbijwvvjm.supabase.co/auth/:path*" },
+    { "source": "/supabase/rest/:path*", "destination": "https://hderthposugfbijwvvjm.supabase.co/rest/:path*" },
+    { "source": "/supabase/storage/:path*", "destination": "https://hderthposugfbijwvvjm.supabase.co/storage/:path*" }
+  ],
   "headers": [
+    {
+      "source": "/supabase/:path*",
+      "headers": [{ "key": "Cache-Control", "value": "private, no-store" }]
+    },
     {
       "source": "/sw.js",
       "headers": [{ "key": "Cache-Control", "value": "no-cache, max-age=0, must-revalidate" }]

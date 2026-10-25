@@ -1,0 +1,54 @@
+<dialog id="applyDialog" class="modal wide">
+      <form id="applyForm" class="dialog-body">
+        <button
+          type="button"
+          class="close"
+          data-close="applyDialog"
+          aria-label="Close application form"
+        >
+          ×
+        </button>
+
+        <span class="eyebrow dark"> APPLICATION </span>
+
+        <h2 id="applyJobTitle">Apply for a position</h2>
+
+        <p class="muted">
+          Upload the required documents; PDF, JPG, PNG, or DOCX, up to 5 MB
+          each. Documents are private.
+        </p>
+
+        <!-- Job ID -->
+        <input type="hidden" id="applyJobId" />
+
+        <!-- Dynamic Requirements -->
+        <div id="requiredFiles" class="requirements"></div>
+
+        <!-- Cover Letter -->
+        <label>
+          Cover letter / additional message
+
+          <textarea
+            name="cover_letter"
+            maxlength="4000"
+            rows="4"
+            placeholder="Introduce yourself to the employer"
+          ></textarea>
+        </label>
+
+        <!-- Document Upload -->
+        <label>
+          Upload requirement documents *
+
+          <input
+            id="documentsInput"
+            type="file"
+            multiple
+            required
+            accept=".pdf,.png,.jpg,.jpeg,.docx"
+          />
+        </label>
+
+        <button class="btn" type="submit">Submit application</button>
+      </form>
+    </dialog>

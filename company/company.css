@@ -1,0 +1,54 @@
+/* Employer portal: the same restrained green, white and compact visual system. */
+body[data-portal="company"] {background:#f4f6f4;color:#40554a;}
+body[data-portal="company"] .main {background:#f4f6f4;min-height:100vh;}
+body[data-portal="company"] .site-header.vacancy-header {background:#fff;border-bottom:1px solid #dfe6df;}
+body[data-portal="company"] .vacancy-header .brand-name {color:#214332;}
+body[data-portal="company"] .vacancy-header .brand small {color:#7b8b7f;letter-spacing:1px;}
+body[data-portal="company"] .vacancy-header .nav-link {color:#617167;}
+body[data-portal="company"] .vacancy-header .nav-link.active {color:#215d3c;border-color:#215d3c;}
+body[data-portal="company"] .vacancy-header .nav-link:hover {color:#215d3c;}
+body[data-portal="company"] .vacancy-header .btn.outline,body[data-portal="company"] .vacancy-header .signup-button {color:#335c43;border-color:#cbd9cf;background:#fff;}
+body[data-portal="company"] main#content {max-width:1400px;padding:0 36px 65px;}
+body[data-portal="company"] #content>.view:not(#home) {margin:38px 0 0;}
+body[data-portal="company"] .page-title {border-bottom:1px solid #dfe6df;}
+body[data-portal="company"] .page-title h1 {color:#203d30;}
+body[data-portal="company"] .page-title p {max-width:730px;}
+body[data-portal="company"] .stats-row {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin:0 0 24px;}
+body[data-portal="company"] .stat-mini {padding:18px 20px;border:1px solid #e0e7df;border-top:3px solid #789681;border-radius:6px;background:#fff;box-shadow:0 3px 10px #29412b03;}
+body[data-portal="company"] .stat-mini b {display:block;color:#234c34;line-height:1.2;letter-spacing:-.6px;}
+body[data-portal="company"] .stat-mini span {display:block;margin-top:9px;color:#7b897e;}
+body[data-portal="company"] .panel {border:1px solid #e0e7df;background:#fff;padding:24px;box-shadow:0 3px 12px #2f422e03;}
+body[data-portal="company"] .section-head {display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px;}
+body[data-portal="company"] .section-head h2 {margin:0;}
+body[data-portal="company"] .btn {background:#276345;border-color:#276345;box-shadow:none;}
+body[data-portal="company"] .btn:hover {background:#20543a;}
+body[data-portal="company"] .btn.outline {background:#fff;color:#276345;}
+body[data-portal="company"] .mini {border:1px solid #d9e3d8;background:#fff;color:#45664d;box-shadow:none;}
+body[data-portal="company"] .mini.warn {color:#876136;border-color:#e7decd;background:#fcfaf5;}
+body[data-portal="company"] table {width:100%;border-collapse:collapse;}
+body[data-portal="company"] th {text-transform:uppercase;letter-spacing:.7px;background:#f6f8f4;color:#718276;padding:14px;border-bottom:1px solid #e1e7de;}
+body[data-portal="company"] td {padding:13px 14px;color:#66766a;border-bottom:1px solid #ecf0e9;vertical-align:middle;}
+body[data-portal="company"] td strong {color:#304d39;font-weight:600;}
+body[data-portal="company"] tbody tr:hover {background:#fafcf8;}
+body[data-portal="company"] .pill {font-size:10px;padding:4px 10px;border-radius:4px;text-transform:capitalize;}
+body[data-portal="company"] .form-panel {max-width:920px;}
+body[data-portal="company"] label {font-weight:500;color:#4f6655;}
+body[data-portal="company"] input,body[data-portal="company"] select,body[data-portal="company"] textarea {border:1px solid #d7e0d6;background:#fff;box-shadow:none;}
+body[data-portal="company"] .audience-editor {border:1px solid #e0e7df;background:#f8faf6;border-radius:4px;padding:18px;margin-bottom:24px;}
+body[data-portal="company"] .audience-editor legend {font-size:13px;font-weight:600;padding:0 6px;}
+body[data-portal="company"] .audience-editor p {font-size:12px;}
+body[data-portal="company"] .audience-editor label {font-size:12px;}
+body[data-portal="company"] .vacancy-sidebar {background:#f8faf6;border:1px solid #e0e7df;border-radius:6px;padding:20px;}
+body[data-portal="company"] .vacancy-search-form input {border-color:#d7e0d6;}
+body[data-portal="company"] .footer {background:#eef2ec;border-top:1px solid #dce4d9;color:#829080;padding:22px 36px;letter-spacing:.3px;}
+@media(max-width:1100px) and (min-width:801px){body[data-portal="company"] .vacancy-header .primary-nav{order:3;flex-basis:100%;justify-content:flex-start;}}
+@media(max-width:800px){
+ body[data-portal="company"] main#content{padding:0 20px 35px;max-width:none;}
+ body[data-portal="company"] .stats-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+ body[data-portal="company"] .stat-mini{padding:16px;}
+ body[data-portal="company"] .panel{padding:16px;min-width:0;}
+ body[data-portal="company"] .form-panel{max-width:none;}
+ body[data-portal="company"] .section-head{gap:12px;}
+ body[data-portal="company"] .section-head h2{font-size:18px;}
+ body[data-portal="company"] .footer{padding:22px 20px 125px;}
+}

@@ -1,0 +1,67 @@
+<section id="profile" class="view">
+            <div class="page-title">
+              <span class="eyebrow dark"> YOUR ACCOUNT </span>
+
+              <h1>Profile settings</h1>
+
+              <p>Keep your personal or business details up to date.</p>
+            </div>
+
+            <!-- Profile Access Gate -->
+            <div id="profileGate" class="panel"></div>
+
+            <!-- Profile Form -->
+            <form id="profileForm" class="panel form-panel hidden">
+              <div class="form-grid">
+                <label>
+                  Full name *
+
+                  <input
+                    name="full_name"
+                    type="text"
+                    required
+                    maxlength="120"
+                  />
+                </label>
+
+                <label>
+                  Phone
+
+                  <input name="phone" type="tel" maxlength="50" />
+                </label>
+
+                <label>
+                  Location
+
+                  <input name="location" type="text" maxlength="120" />
+                </label>
+
+                <label id="companyNameField">
+                  Company name
+
+                  <input name="company_name" type="text" maxlength="180" />
+                </label>
+              </div>
+
+              <label>
+                About you / company
+
+                <textarea name="bio" rows="4" maxlength="2000"></textarea>
+              </label>
+
+              <button class="btn" type="submit">Save changes</button>
+            </form>
+            <section id="passwordPanel" class="panel form-panel hidden" aria-labelledby="passwordHeading">
+              <h2 id="passwordHeading">Reset password</h2>
+              <p>Choose a new password for your account, or request a reset link by email.</p>
+              <form id="passwordForm">
+                <label>New password<input name="new_password" type="password" autocomplete="new-password" minlength="8" required /></label>
+                <label>Confirm new password<input name="confirm_password" type="password" autocomplete="new-password" minlength="8" required /></label>
+                <p class="muted">Use at least 8 characters.</p>
+                <button type="submit" class="btn">Update password</button>
+              </form>
+              <hr />
+              <button id="sendPasswordReset" type="button" class="text-button">Email me a password reset link</button>
+              <p id="passwordStatus" role="status" aria-live="polite"></p>
+            </section>
+          </section>

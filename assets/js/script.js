@@ -27,7 +27,7 @@
   function errorMessage(e) {
     const message = e?.message || String(e);
     if (/failed to fetch|fetch failed|networkerror|network request failed/i.test(message))
-      return "Cannot reach the database. Check your connection and the Supabase Project URL in config.js.";
+      return "The connection to the employment service was interrupted. Check your internet connection and try again.";
     if (["PGRST205", "PGRST204", "42P01", "42883", "PGRST202"].includes(e?.code))
       return "Database setup is incomplete. Apply migrations/002-career-portal.sql to an existing database, or schema.sql followed by the migration for a new project.";
     if (e?.code === "42501")
@@ -50,6 +50,13 @@
     currentView = "home",
     adminTab = "companies";
   const pageRole = document.body.dataset.portal || "public";
+  const connectionScreen = document.createElement('section');
+  connectionScreen.className = 'connection-screen';
+  connectionScreen.setAttribute('aria-live', 'polite');
+  connectionScreen.innerHTML = '<p class="section-kicker">HAPISABELA</p><h1>Connecting to your workspace</h1><p>Verifying your session and loading your account.</p>';
+  $('#content').before(connectionScreen);
+  connectionScreen.hidden = pageRole === 'public';
+  if (pageRole !== 'public') document.body.classList.add('portal-connecting');
   const rolePaths = {
     admin: "/admin/",
     company: "/company/",
@@ -574,28 +581,26 @@
   }
   async function initialize() {
     if (!configured()) {
-      $("#jobGrid").innerHTML = gate(
-        "Setup required: edit config.js with your Supabase Project URL and public publishable / anon key. Then run schema.sql in Supabase SQL Editor.",
-      );
-      $("#totalJobs").textContent = "—";
-      return;
+      throw new Error('The employment service is not configured. Please contact the site administrator.');
     }
     if (!window.supabase?.createClient) {
-      $("#jobGrid").innerHTML = gate(
-        "Supabase JS library did not load. Check your internet connection or script URL.",
-      );
-      return;
+      throw new Error('The account library could not load. Check your internet connection and try again.');
     }
     sb = window.supabase.createClient(
       window.ISABELA_SUPABASE_URL,
       window.ISABELA_SUPABASE_KEY,
+      { global: { fetch: window.IsabelaConnection.createFetch({
+        upstream: window.ISABELA_SUPABASE_URL,
+        proxy: window.ISABELA_SUPABASE_PROXY,
+      }) } },
     );
     window.IsabelaPassword.bind(sb);
     authUI = window.IsabelaAuth.bind({ client: sb, signedIn: async account => {
       user = account;
       await loadProfile();
       if (enforceRoleRoute()) return;
-      await loadJobs();
+      if (isAdmin()) loadJobs().catch(err);
+      else await loadJobs();
       go(isAdmin() ? "admin" : "dashboard");
     } });
     window.IsabelaAdminUsers.bind({ client: sb, isAdmin, refresh: async () => { adminTab = "users"; await admin(); } });
@@ -605,14 +610,15 @@
     if (user) await loadProfile();
     else redrawNav();
     if (enforceRoleRoute()) return;
-    await loadJobs();
-    go(
-      pageRole === "admin"
-        ? "admin"
-        : pageRole === "public"
-          ? "home"
-          : "dashboard",
-    );
+    if (pageRole === 'admin') {
+      go('admin');
+      loadJobs().catch(err);
+    } else {
+      await loadJobs();
+      go(pageRole === "public" ? "home" : "dashboard");
+    }
+    document.body.classList.remove('portal-connecting');
+    connectionScreen.hidden = true;
     sb.auth.onAuthStateChange((_event, session) => {
       const id = session?.user?.id || null;
       if (id !== (user?.id || null)) {
@@ -676,6 +682,10 @@
   });
   redrawNav();
   initialize().catch((e) => {
+    if (pageRole !== 'public') {
+      connectionScreen.innerHTML = `<p class="section-kicker">CONNECTION UNAVAILABLE</p><h1>Unable to open your workspace</h1><p>${esc(errorMessage(e))}</p><button class="btn" data-retry-connection>Try again</button><a href="/">Return to job search</a>`;
+      return;
+    }
     $("#resultCount").textContent = "Unable to load vacancies";
     $("#jobGrid").innerHTML = `<div class="panel" role="alert"><p>${esc(errorMessage(e))}</p><button class="btn" data-retry-connection>Retry connection</button></div>`;
     err(e);

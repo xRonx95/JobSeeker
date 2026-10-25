@@ -64,7 +64,9 @@
   if (document.body.hasAttribute('data-password-page')) {
     const status = $('#passwordStatus');
     if (!window.supabase?.createClient) { status.textContent = 'Unable to load password recovery. Check your connection and reload.'; return; }
-    const client = window.supabase.createClient(window.ISABELA_SUPABASE_URL, window.ISABELA_SUPABASE_KEY);
+    const client = window.supabase.createClient(window.ISABELA_SUPABASE_URL, window.ISABELA_SUPABASE_KEY, {
+      global: { fetch: window.IsabelaConnection.createFetch({ upstream: window.ISABELA_SUPABASE_URL, proxy: window.ISABELA_SUPABASE_PROXY }) },
+    });
     const ui = bind(client);
     function showSession(session) {
       const signedIn = !!session?.user;

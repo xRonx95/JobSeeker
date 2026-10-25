@@ -30,7 +30,9 @@ async function main(){
     if(fs.existsSync(file)&&fs.statSync(file).isDirectory())file=path.join(file,'index.html');
     if(!fs.existsSync(file)){res.writeHead(404).end();return;}
     res.setHeader('Content-Type',({'.html':'text/html','.js':'application/javascript','.css':'text/css','.jpg':'image/jpeg','.png':'image/png','.ico':'image/x-icon','.webmanifest':'application/manifest+json'})[path.extname(file)]||'text/plain');
-    res.end(fs.readFileSync(file));
+    res.end(path.basename(file)==='config.js'
+      ? fs.readFileSync(file,'utf8')+'\nwindow.ISABELA_SUPABASE_PROXY="/supabase";'
+      : fs.readFileSync(file));
   });
   await new Promise(r=>server.listen(0,'127.0.0.1',r));
   const base=`http://127.0.0.1:${server.address().port}`;
@@ -47,7 +49,7 @@ async function main(){
   ws=new WebSocket(tabs.find(x=>x.type==='page').webSocketDebuggerUrl);
   await new Promise((resolve,reject)=>{ws.onopen=resolve;ws.onerror=reject;});
   let seq=0;const pending=new Map(),errors=[];
-  let mockRole='admin', saved=[], content=[], passwordUpdates=0, resetRequests=[], signupRequests=[];
+  let mockRole='admin', saved=[], content=[], passwordUpdates=0, resetRequests=[], signupRequests=[], failStartup=false, proxyRequests=0;
   const mockUser={id:'00000000-0000-4000-8000-000000000001',email:'review@example.test',app_metadata:{provider:'email'},user_metadata:{},aud:'authenticated',created_at:'2026-01-01T00:00:00Z'};
   function send(method,params={}){return new Promise((resolve,reject)=>{const id=++seq;pending.set(id,{resolve,reject});ws.send(JSON.stringify({id,method,params}));});}
   const jobs=Array.from({length:23},(_,i)=>({id:`job-${i}`,company_id:i%2?'b':'a',title:i%2?'Office Assistant':'Software Developer',company_name:i%2?'Basilan Community Services':'Isabela Technology Group',location:'Isabela City, Basilan',category:i%2?'Administration':'Information Technology',employment_type:'Full-time',description:'An opportunity to grow your career in the local community.',qualifications:'Communication and teamwork skills.',requirements:['Resume'],audiences:i%2?['pwd','high-school']:[],salary:i%2?'₱18,000–₱22,000 / month':null,status:'approved',created_at:new Date(Date.UTC(2026,9,20-i)).toISOString()}));
@@ -59,6 +61,10 @@ async function main(){
     if(m.method==='Runtime.exceptionThrown')errors.push(m.params.exceptionDetails.text+': '+(m.params.exceptionDetails.exception?.description||''));
     if(m.method==='Fetch.requestPaused'){
       const {request,requestId}=m.params;const url=new URL(request.url);let data=[];
+      if(url.pathname.startsWith('/supabase/')){proxyRequests++;url.pathname=url.pathname.slice('/supabase'.length);}
+      if(failStartup&&url.pathname==='/rest/v1/profiles'){
+        await send('Fetch.fulfillRequest',{requestId,responseCode:503,responseHeaders:[{name:'Content-Type',value:'application/json'}],body:Buffer.from(JSON.stringify({message:'Service temporarily unavailable'})).toString('base64')});return;
+      }
       if(url.pathname==='/auth/v1/user')data=mockUser;
       if(url.pathname==='/auth/v1/signup'&&request.method==='POST'){signupRequests.push(JSON.parse(request.postData));data={id:'signup-user',email:'new@example.test',identities:[{id:'signup-user'}]};}
       if(url.pathname==='/auth/v1/user'&&request.method==='PUT')passwordUpdates++;
@@ -93,7 +99,7 @@ async function main(){
     }
   };
   await send('Runtime.enable');await send('Page.enable');
-  await send('Fetch.enable',{patterns:[{urlPattern:'https://*.supabase.co/*'}]});
+  await send('Fetch.enable',{patterns:[{urlPattern:'https://*.supabase.co/*'},{urlPattern:base+'/supabase/*'}]});
   const evaluate=async expression=>(await send('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true})).result.value;
   async function until(expression){for(let i=0;i<100;i++){if(await evaluate(expression))return;await wait(100);}throw new Error('Timed out: '+expression+'\n'+JSON.stringify(await evaluate("({toast:document.querySelector('#toast')?.textContent,invalid:[...document.querySelectorAll(':invalid')].map(x=>({name:x.name,value:x.value,message:x.validationMessage})),admin:document.querySelector('#adminContent')?.textContent.slice(0,500)})"))+'\n'+errors.join('\n'));}
   await send('Emulation.setDeviceMetricsOverride',{width:1365,height:1000,deviceScaleFactor:1,mobile:false});
@@ -187,6 +193,13 @@ async function main(){
   const session={access_token:`eyJhbGciOiJIUzI1NiJ9.${payload}.review`,refresh_token:'review-only',token_type:'bearer',expires_in:3600,expires_at:Math.floor(Date.now()/1000)+3600,user:mockUser};
   const authScript = await send('Page.addScriptToEvaluateOnNewDocument',{source:`localStorage.setItem('sb-hderthposugfbijwvvjm-auth-token',${JSON.stringify(JSON.stringify(session))});`});
   await send('Emulation.setDeviceMetricsOverride',{width:1365,height:1000,deviceScaleFactor:1,mobile:false});
+  failStartup=true;
+  await send('Page.navigate',{url:base+'/admin/'});
+  await until("document.querySelector('.connection-screen')?.textContent.includes('Unable to open your workspace')");
+  assert.equal(await evaluate("getComputedStyle(document.querySelector('#content')).display"),'none','A failed admin startup exposed the jobs page');
+  assert.equal(await evaluate("getComputedStyle(document.querySelector('.top-actions')).display"),'none','A failed admin startup showed signed-out controls');
+  assert.equal(await evaluate("document.querySelector('[data-retry-connection]')!==null"),true);
+  failStartup=false;
   await send('Page.navigate',{url:base+'/admin/'});
   await until("document.querySelector('[data-manage-resources]')!==null");
   assert.equal(await evaluate("document.querySelector('#adminContent').textContent.includes('first 500')"),false);
@@ -248,6 +261,26 @@ async function main(){
   await until("document.querySelector('.resource-admin-list')?.textContent.includes('Updated article')");
   await evaluate("window.confirm=()=>true;document.querySelector('[data-delete-resource]').click()");
   await until("document.querySelector('.resource-admin-list')?.textContent.includes('No career content yet')");
+  mockRole='company';
+  await send('Page.navigate',{url:base+'/company/'});
+  await until("document.querySelector('#dashboardContent .stats-row')!==null");
+  assert.equal(await evaluate("document.querySelector('#dashboard').classList.contains('active')"),true);
+  assert.equal(await evaluate("getComputedStyle(document.querySelector('[data-view=\"admin\"]')).display"),'none');
+  const companyShot=await send('Page.captureScreenshot',{format:'png'});
+  fs.writeFileSync(path.join(output,'company-dashboard.png'),Buffer.from(companyShot.data,'base64'));
+  await evaluate("document.querySelector('[data-view=\"post\"]').click()");
+  assert.equal(await evaluate("document.querySelector('#jobForm').classList.contains('hidden')"),false);
+  for(const width of [320,390,768]){
+    await send('Emulation.setDeviceMetricsOverride',{width,height:844,deviceScaleFactor:1,mobile:true});
+    assert.equal(await evaluate('document.documentElement.scrollWidth<=window.innerWidth'),true,'Company job form overflows at '+width+'px');
+  }
+  await evaluate("document.querySelector('[data-view=\"profile\"]').click()");
+  await until("document.querySelector('#profileForm').elements.company_name.value==='Review employer'");
+  assert.equal(await evaluate("document.querySelector('#companyNameField').classList.contains('hidden')"),false);
+  await evaluate("document.querySelector('[data-view=\"applications\"]').click()");
+  await until("document.querySelector('#applicationsContent table')!==null");
+  assert.equal(await evaluate('document.documentElement.scrollWidth<=window.innerWidth'),true,'Company applications overflow');
+  await send('Emulation.setDeviceMetricsOverride',{width:1365,height:1000,deviceScaleFactor:1,mobile:false});
   mockRole='seeker';
   await send('Page.navigate',{url:base+'/job-seeker/'});
   await until("document.querySelector('#welcome')?.textContent.includes('Review account')");
@@ -318,6 +351,7 @@ async function main(){
   await until("document.title.includes(\"You're offline\")");
   simulateOffline = false;
   assert.deepEqual(errors,[],'Browser runtime exceptions');
+  assert.ok(proxyRequests>20,'SDK calls did not use the same-origin database route');
   console.log('Browser checks passed: app-style mobile navigation, category chips, filter toggle, saved/account/activity flows, detail sheet, 320–768px layouts, install manifest/offline fallback, and all portal/auth regression checks.');
   console.log('Screenshots: .tmp-ui/vacancies-desktop.png and .tmp-ui/vacancies-mobile.png');
   await send('Browser.close').catch(()=>{});

@@ -59,6 +59,10 @@ Validate account creation without production writes using `node --test tests/adm
 
 ## Check a failed database connection
 
+HTTPS deployments send Supabase SDK authentication, database, and storage HTTP requests through `/supabase/` on the website's own domain. `vercel.json` uses [external rewrites](https://vercel.com/docs/routing/rewrites) to the configured Supabase project. This avoids requiring the visitor's browser to connect directly to the Supabase hostname. The original project URL and session storage key are preserved; Supabase still checks the user's token and RLS. These routes are marked private/no-store and use no server secret. Local HTTP static previews continue to use the direct project URL.
+
+Deploy `vercel.json`, `config.js`, `assets/js/connection.js`, the updated application scripts, and all HTML changes together. If the Supabase project changes, update both `config.js` and the three fixed destinations in `vercel.json`. Verify `/supabase/auth/v1/settings` and a public jobs request with the publishable key after deployment; a static server without Vercel rewrites cannot serve these HTTPS routes. Protected portals display a connection/retry screen until session verification succeeds, rather than showing the public jobs page after a startup error.
+
 Run `node scripts/check-connection.cjs` (Node.js 18 or newer). This checks the Auth endpoint and reads at most one approved job using the public key; it does not modify data.
 
 - `ENOTFOUND`: copy the exact Project URL from Supabase's Connect dialog into `config.js`. A key cannot repair an incorrect hostname.

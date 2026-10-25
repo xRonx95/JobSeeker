@@ -1,4 +1,4 @@
-// The public page is the shared template for all role portals.
+// Admin and company portals have independent HTML source sections.
 const fs = require('node:fs');
 const path = require('node:path');
 const root = path.join(__dirname, '..');
@@ -16,7 +16,6 @@ html = html.replace('</body>',`<!-- MOBILE APP SHELL -->\n${mobileShell}\n<!-- E
 html = refreshAssets(html);
 fs.writeFileSync(path.join(root, 'index.html'), html);
 for (const [folder, role, title] of [
-  ['company', 'company', 'Employer dashboard'],
   ['job-seeker', 'seeker', 'Job seeker dashboard'],
 ]) {
   fs.writeFileSync(path.join(root, folder, 'index.html'), html
@@ -28,4 +27,5 @@ for (const file of ['reset-password.html','privacy.html','terms.html']) {
   fs.writeFileSync(location,refreshAssets(fs.readFileSync(location,'utf8')));
 }
 require('./build-admin.cjs')();
-console.log('Updated employer and seeker portals; assembled the independent admin portal.');
+require('./build-company.cjs')();
+console.log('Updated the seeker portal; assembled the independent admin and company portals.');
