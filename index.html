@@ -23,6 +23,9 @@
     <link rel="stylesheet" href="/assets/css/vacancies.css?v=hapisabela-mobile-3" />
     <link rel="stylesheet" href="/assets/css/green-theme.css?v=hapisabela-mobile-3" />
     <link rel="stylesheet" href="/assets/css/mobile-app.css?v=hapisabela-mobile-3" />
+    <link rel="stylesheet" href="/assets/css/professional.css?v=1" />
+    <script defer src="/assets/js/discovery.js?v=1"></script>
+    <link rel="stylesheet" href="/assets/css/compact-theme.css?v=formal-1" />
     <link rel="icon" href="/favicon.ico?v=hapisabela-mobile-3" type="image/x-icon" />
 
     <!-- Supabase Configuration -->
@@ -36,7 +39,7 @@
 
     <script defer src="/assets/js/vacancies.js?v=hapisabela-mobile-3"></script>
     <script defer src="/assets/js/password.js?v=hapisabela-mobile-3"></script>
-    <script defer src="/assets/js/admin-users.js?v=hapisabela-mobile-3"></script>
+    <script defer src="/assets/js/admin-users.js?v=account-errors-2"></script>
     <script defer src="/assets/js/auth.js?v=hapisabela-mobile-3"></script>
     <script defer src="/assets/js/admin-dashboard.js?v=hapisabela-mobile-3"></script>
     <script defer src="/assets/js/mobile.js?v=hapisabela-mobile-3"></script>
@@ -74,19 +77,21 @@
           <section id="home" class="view active">
   <div class="mobile-welcome"><div><p id="mobileGreeting">Hello, there <span aria-hidden="true">✦</span></p><span>Welcome to HapIsabela</span></div><button type="button" class="mobile-avatar" data-mobile-destination="account" aria-label="Open your account"><span id="mobileInitials">HI</span></button></div>
   <div class="mobile-page-heading"><span class="mobile-eyebrow">YOUR NEXT CHAPTER</span><h1>Find work.<br><span>Build your future.</span></h1></div>
-  <div class="vacancy-heading"><div><p class="breadcrumb">Home <span>/</span> Jobs</p><h1>Job vacancies<span class="heading-dot">.</span></h1><p>Your next opportunity starts here. Find work in Isabela City and beyond.</p></div><span class="local-badge">ISABELA CITY · BASILAN</span></div>
-  <div class="vacancy-layout">
-    <div class="vacancy-main">
-      <section class="vacancy-search" aria-labelledby="findJobsHeading">
-        <h2 id="findJobsHeading">Find a job here</h2><p>Search by position, skill, company, or location.</p>
+  <section class="career-hero" aria-labelledby="careerTitle"><div class="hero-intro"><p class="hero-eyebrow">THE HAPISABELA CAREER PORTAL</p><h1 id="careerTitle">Local talent.<br><span>Meaningful opportunities.</span></h1><p>Connect with employers and take the next step in your career.<br class="desktop-break"> Explore employment in Isabela City, Basilan, and beyond.</p><span class="hero-location">ISABELA CITY, BASILAN &nbsp; / &nbsp; CAREERS &amp; EMPLOYMENT</span></div>      <section class="vacancy-search" aria-labelledby="findJobsHeading">
+        <h2 id="findJobsHeading">Find your next opportunity</h2><p>Discover roles that match your skills and ambitions.</p>
         <form id="heroSearch" role="search" class="vacancy-search-form">
-          <label><span class="sr-only">Job title, keyword, or company</span><input id="searchBox" type="search" placeholder="Job title, keyword, or company" /></label>
-          <label id="mobileLocationFilters"><span class="sr-only">City or location</span><input id="locationSearch" type="search" placeholder="City or location" /></label>
-          <button type="submit" class="btn mobile-search-submit" aria-label="Search jobs"><svg class="mobile-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><span>Search</span></button>
+          <label><span class="search-field-label">What</span><input id="searchBox" type="search" placeholder="Job title, keyword, or company" /></label>
+          <label id="mobileLocationFilters"><span class="search-field-label">Where</span><input id="locationSearch" type="search" placeholder="City or location" /></label>
+          <button type="submit" class="btn mobile-search-submit" aria-label="Search jobs"><svg class="mobile-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><span>Find jobs</span></button>
           <button id="mobileFilterToggle" type="button" class="mobile-filter-toggle" aria-label="Show job filters" aria-controls="mobileLocationFilters mobileAudienceFilters mobileVacancyFilters" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M3 6h8m6 0h4M3 18h4m6 0h8"/><circle cx="14" cy="6" r="3"/><circle cx="10" cy="18" r="3"/></svg></button>
         </form>
         <div id="mobileAudienceFilters" class="audience-filters"><span>Opportunities for</span><label><input type="checkbox" data-audience="pwd" /> Persons with disabilities</label><label><input type="checkbox" data-audience="overseas" /> Overseas workers</label><label><input type="checkbox" data-audience="high-school" /> High school graduates</label><label><input type="checkbox" data-audience="government" /> Government jobs</label></div>
       </section>
+</section>
+  <section class="browse-directory" aria-labelledby="browseTitle"><div class="browse-title"><div><p class="section-kicker">EXPLORE YOUR OPTIONS</p><h2 id="browseTitle">Find the right direction.</h2></div><a href="#jobsArea">View job listings <span aria-hidden="true">&rarr;</span></a></div><div class="browse-columns"><div><h3>Browse by specialisation</h3><div class="browse-links"><button data-discover-category="Administration">Administration <span>&rarr;</span></button><button data-discover-category="Information Technology">Information technology <span>&rarr;</span></button><button data-discover-category="Healthcare">Healthcare <span>&rarr;</span></button><button data-discover-category="Education">Education <span>&rarr;</span></button><button data-discover-category="Retail &amp; Sales">Retail &amp; sales <span>&rarr;</span></button><button data-discover-category="Hospitality">Hospitality <span>&rarr;</span></button></div></div><div><h3>Search by location</h3><div class="browse-links"><button data-discover-location="Isabela City">Isabela City <span>&rarr;</span></button><button data-discover-location="Basilan">Basilan <span>&rarr;</span></button><button data-discover-location="Zamboanga">Zamboanga <span>&rarr;</span></button><button data-discover-location="">All locations <span>&rarr;</span></button></div><p class="browse-note">Choose a location to filter available vacancies.</p></div></div></section>
+  <div class="listings-heading"><div><p class="section-kicker">YOUR NEXT STEP</p><h2>Explore available vacancies</h2></div><span>Published opportunities from approved employers</span></div>
+  <div class="vacancy-layout">
+    <div class="vacancy-main">
       <section class="mobile-discovery" aria-label="Explore job categories"><div class="mobile-section-heading"><h2>Explore opportunities</h2><span>Made for you</span></div><div class="mobile-category-chips" aria-label="Quick category filters"><button type="button" class="active" data-mobile-category="" aria-pressed="true">All jobs</button><button type="button" data-mobile-category="Information Technology" aria-pressed="false">Technology</button><button type="button" data-mobile-category="Administration" aria-pressed="false">Administration</button><button type="button" data-mobile-category="Healthcare" aria-pressed="false">Healthcare</button><button type="button" data-mobile-category="Retail &amp; Sales" aria-pressed="false">Retail &amp; Sales</button></div><div class="mobile-feature"><div><span>LOCAL TALENT. REAL OPPORTUNITY.</span><h2>Good work.<br>Closer to home.</h2><p>Your next opportunity could be<br>right here in Isabela.</p><button type="button" data-mobile-browse>Explore jobs <span aria-hidden="true">↗</span></button></div><svg class="mobile-city-art" viewBox="0 0 150 180" fill="none" aria-hidden="true"><circle cx="105" cy="42" r="31" fill="currentColor" opacity=".18"/><path d="M15 164h125M31 162V69l45-21v114M76 162V91l44 18v53M31 71l45-22M47 85v10m14-17v10M47 109v10m14-17v10m-14 21v10m14-17v10m32-19v10m14-5v10" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="m7 131 11-13 11 13m-11-12v43m111-21 10-12 10 12m-10-11v33" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></div></section>
       <section id="jobsArea" aria-label="Job vacancies">
         <div class="vacancy-toolbar"><p id="resultCount" role="status" aria-live="polite">Loading vacancies…</p><div><button type="button" class="text-button" id="clearFilters">Reset filters</button><label><span class="sr-only">Sort vacancies</span><select id="sortJobs"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="title">Job title A–Z</option><option value="company">Company A–Z</option></select></label></div></div>
@@ -96,9 +101,9 @@
     </div>
     <aside class="vacancy-sidebar" aria-label="Job seeker resources">
       <section class="sidebar-section"><span class="section-kicker">EXPLORE OPPORTUNITIES</span><h2>Top job openings</h2><div id="topOpenings"><p>Loading openings…</p></div></section>
-      <section class="sidebar-section"><h2>Career advice</h2><button class="advice-tile interview-tile" data-article="interview"><span class="tile-illustration" aria-hidden="true">↗</span><span class="section-kicker">MAKE YOUR NEXT MOVE</span><strong>Walk into your next<br>interview with confidence.</strong><span>Read the interview guide →</span></button><button class="advice-tile resume-tile" data-article="resume"><span class="section-kicker">A STRONG FIRST IMPRESSION</span><strong>A better résumé.<br>A brighter beginning.</strong><span>Build your application checklist →</span></button></section>
-      <section class="employer-callout"><span class="section-kicker">FOR EMPLOYERS</span><h2>Great people.<br>Right here.</h2><p>Find your next team member in our community.</p><button class="btn" data-hiring>Post a vacancy →</button></section>
-      <section class="sidebar-section"><h2>Our community, in numbers</h2><div class="compact-metrics"><div><strong id="totalJobs">—</strong><span>Open vacancies</span></div><div><strong id="totalCompanies">—</strong><span>Companies hiring</span></div><div><strong id="myApplicationCount">—</strong><span>Your applications</span></div></div></section>
+      <section class="sidebar-section"><h2>Career advice</h2><button class="advice-tile interview-tile" data-article="interview"><span class="tile-illustration" aria-hidden="true">↗</span><span class="section-kicker">MAKE YOUR NEXT MOVE</span><strong>Prepare for your<br>next interview.</strong><span>Read the interview guide →</span></button><button class="advice-tile resume-tile" data-article="resume"><span class="section-kicker">A STRONG FIRST IMPRESSION</span><strong>A better résumé.<br>A brighter beginning.</strong><span>Build your application checklist →</span></button></section>
+      <section class="employer-callout"><span class="section-kicker">FOR EMPLOYERS</span><h2>Connect with<br>local talent.</h2><p>Reach qualified candidates and build your team with HapIsabela.</p><button class="btn" data-hiring>Post a vacancy →</button></section>
+      <section class="sidebar-section"><h2>Employment overview</h2><div class="compact-metrics"><div><strong id="totalJobs">—</strong><span>Open vacancies</span></div><div><strong id="totalCompanies">—</strong><span>Companies hiring</span></div><div><strong id="myApplicationCount">—</strong><span>Your applications</span></div></div></section>
       <p class="safety-note">Apply with confidence. Verify employer details and never pay to apply for a job.</p>
     </aside>
   </div>
@@ -357,10 +362,7 @@
         <!-- =====================================
                  FOOTER
             ====================================== -->
-        <footer class="footer">
-          HapIsabela · An independent employment portal concept · Please
-          verify employers and never pay to apply.
-        </footer>
+        <footer class="footer"><div class="footer-inner"><div><strong>HapIsabela</strong><p>Connecting local talent with meaningful opportunities.</p></div><div><a href="/privacy.html">Privacy policy</a><a href="/terms.html">Terms of use</a><a href="#jobsArea">Find jobs</a></div></div><div class="footer-bottom">An independent employment portal for Isabela City, Basilan.<span>Verify employer details. Never pay to apply.</span></div></footer>
       </div>
     </div>
 

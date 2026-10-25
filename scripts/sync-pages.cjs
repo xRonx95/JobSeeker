@@ -2,7 +2,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const root = path.join(__dirname, '..');
-const assetVersion = 'hapisabela-mobile-3';
+const assetVersion = 'formal-compact-1';
 const refreshAssets = content => content.replace(/((?:src|href)=")(\/(?:assets\/[^"?]+|config\.js|favicon\.ico))(?:\?[^\"]*)?(\")/g, `$1$2?v=${assetVersion}$3`);
 let html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const start = html.indexOf('<section id="home"');
@@ -16,7 +16,6 @@ html = html.replace('</body>',`<!-- MOBILE APP SHELL -->\n${mobileShell}\n<!-- E
 html = refreshAssets(html);
 fs.writeFileSync(path.join(root, 'index.html'), html);
 for (const [folder, role, title] of [
-  ['admin', 'admin', 'Administration'],
   ['company', 'company', 'Employer dashboard'],
   ['job-seeker', 'seeker', 'Job seeker dashboard'],
 ]) {
@@ -28,4 +27,5 @@ for (const file of ['reset-password.html','privacy.html','terms.html']) {
   const location = path.join(root,file);
   fs.writeFileSync(location,refreshAssets(fs.readFileSync(location,'utf8')));
 }
-console.log('Updated all three role portals from index.html.');
+require('./build-admin.cjs')();
+console.log('Updated employer and seeker portals; assembled the independent admin portal.');

@@ -1,0 +1,121 @@
+<section id="post" class="view">
+            <div class="page-title">
+              <span class="eyebrow dark"> EMPLOYER WORKSPACE </span>
+
+              <h1>Post a job</h1>
+
+              <p>
+                Describe your vacancy and the required applicant documents.
+                Listings are reviewed by an admin before publication.
+              </p>
+            </div>
+
+            <!-- Company Access Gate -->
+            <div id="postGate" class="panel"></div>
+
+            <!-- Post Job Form -->
+            <form id="jobForm" class="panel form-panel hidden">
+              <h3>Job information</h3>
+
+              <fieldset class="audience-editor"><legend>Opportunity groups (optional)</legend><p>Select only the groups this vacancy explicitly supports.</p><label><input type="checkbox" name="audiences" value="pwd" /> Persons with disabilities</label><label><input type="checkbox" name="audiences" value="overseas" /> Overseas workers</label><label><input type="checkbox" name="audiences" value="high-school" /> High school graduates</label><label><input type="checkbox" name="audiences" value="government" /> Government vacancy</label></fieldset><div class="form-grid">
+                <label>
+                  Job title *
+
+                  <input
+                    name="title"
+                    type="text"
+                    required
+                    maxlength="140"
+                    placeholder="e.g. Office Assistant"
+                  />
+                </label>
+
+                <label>
+                  Category *
+
+                  <select name="category" required>
+                    <option value="">Choose category</option>
+                    <option>Administration</option>
+                    <option>Education</option>
+                    <option>Information Technology</option>
+                    <option>Healthcare</option>
+                    <option>Retail &amp; Sales</option>
+                    <option>Hospitality</option>
+                    <option>Construction</option>
+                    <option>Other</option>
+                  </select>
+                </label>
+
+                <label>
+                  Location *
+
+                  <input
+                    name="location"
+                    type="text"
+                    required
+                    value="Isabela City, Basilan"
+                  />
+                </label>
+
+                <label>
+                  Employment type *
+
+                  <select name="employment_type" required>
+                    <option value="">Choose type</option>
+                    <option>Full-time</option>
+                    <option>Part-time</option>
+                    <option>Contract</option>
+                    <option>Internship</option>
+                    <option>Remote</option>
+                  </select>
+                </label>
+
+                <label>
+                  Salary (optional)
+
+                  <input
+                    name="salary"
+                    type="text"
+                    maxlength="80"
+                    placeholder="e.g. ₱15,000–₱20,000/month"
+                  />
+                </label>
+              </div>
+
+              <label>
+                Job description *
+
+                <textarea
+                  name="description"
+                  rows="5"
+                  required
+                  maxlength="6000"
+                  placeholder="Responsibilities and position overview"
+                ></textarea>
+              </label>
+
+              <label>
+                Qualifications *
+
+                <textarea
+                  name="qualifications"
+                  rows="4"
+                  required
+                  maxlength="4000"
+                  placeholder="Experience, skills, education"
+                ></textarea>
+              </label>
+
+              <label>
+                Applicant documents required (one per line)
+
+                <textarea
+                  name="requirements"
+                  rows="4"
+                  placeholder="Resume / CV&#10;Application Letter&#10;Transcript of Records"
+                ></textarea>
+              </label>
+
+              <button class="btn" type="submit">Submit for approval →</button>
+            </form>
+          </section>

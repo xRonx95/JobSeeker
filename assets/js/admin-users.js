@@ -1,7 +1,18 @@
 /* The browser sends only the administrator session token to our server API. */
 (() => {
   'use strict';
+  function responseError(response, result) {
+    if (typeof result?.error === 'string' && result.error.trim()) return result.error;
+    if (response.status === 401) return 'Your administrator session has expired. Log out, log in again, and retry.';
+    if (response.status === 403) return 'Account creation was denied. Confirm that you are signed in as an active administrator.';
+    if ([404, 405].includes(response.status)) return 'The account creation API is not available on this deployment. Deploy the complete project, including api/admin/users.mjs, to Vercel.';
+    if (response.status === 429) return 'Too many account requests. Wait a moment before trying again.';
+    if ([408, 504].includes(response.status)) return 'The server timed out while creating the account. Check All users and Supabase Authentication for this email before retrying; the account may already exist.';
+    const reference = response.headers.get('x-vercel-id');
+    return `The account creation server returned HTTP ${response.status}. Check All users and Supabase Authentication before retrying.${reference ? ` Deployment reference: ${reference}.` : ''} The site owner should check the Vercel function logs for /api/admin/users.`;
+  }
   window.IsabelaAdminUsers = {
+    responseError,
     bind({ client, isAdmin, refresh }) {
       const $ = selector => document.querySelector(selector);
       const dialog = $('#addUserDialog'), form = $('#addUserForm'), status = $('#addUserStatus');
@@ -23,7 +34,7 @@
       }
       document.addEventListener('click', event => {
         if (!event.target.closest('[data-add-user]') || !isAdmin() || busy) return;
-        clear(); dialog.showModal();
+        clear(); dialog.showModal(); dialog.scrollTop = 0;
       });
       form.elements.role.addEventListener('change', roleFields);
       $('#addAnotherUser').addEventListener('click', clear);
@@ -52,7 +63,7 @@
             body: JSON.stringify(body),
           });
           const result = await response.json().catch(() => null);
-          if (!response.ok) throw new Error(result?.error || (response.status === 404 ? 'The account creation API is not deployed. Deploy this project with its api folder to Vercel.' : 'Account creation failed. Check All users before retrying.'));
+          if (!response.ok) throw new Error(responseError(response, result));
           if (!result?.user?.email || !result.temporary_password) throw new Error('The result could not be verified. Check All users before retrying.');
           form.reset(); form.classList.add('hidden');
           $('#createdUserEmail').value = result.user.email;

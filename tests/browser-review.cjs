@@ -107,7 +107,9 @@ async function main(){
   assert.match(await evaluate("document.querySelector('#toggleAuth').textContent"),/Create an account.*Sign up/);
   assert.equal(await evaluate("new URL(document.querySelector('.brand-logo').src).pathname"),'/favicon.ico');
   assert.equal(await evaluate("new URL(document.querySelector('.auth-logo').src).pathname"),'/favicon.ico');
-  assert.ok(await evaluate("parseFloat(getComputedStyle(document.body).fontSize)>=18"));
+  assert.equal(await evaluate("getComputedStyle(document.body).fontSize"),'14px','Desktop body text should use the compact type scale');
+  assert.ok(await evaluate("parseFloat(getComputedStyle(document.querySelector('.nav-link')).fontSize)<=13"),'Navigation text is oversized');
+  assert.ok(await evaluate("parseFloat(getComputedStyle(document.querySelector('#careerTitle')).fontSize)<=38"),'Hero heading is oversized');
   const loginShot=await send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(output,'login-green.png'),Buffer.from(loginShot.data,'base64'));
   await evaluate("document.querySelector('#toggleAuth').click()");
   assert.deepEqual(await evaluate("[...document.querySelector('#roleSelect').options].map(x=>x.value)"),['seeker','company']);
@@ -133,6 +135,13 @@ async function main(){
   await evaluate("document.querySelector('#authDialog').close();document.querySelector('.vacancy-title').click()");
   assert.equal(await evaluate("document.querySelector('#jobDialog').open"),true);
   await evaluate("document.querySelector('#jobDialog').close()");
+  await evaluate("document.querySelector('[data-discover-category=\"Healthcare\"]').click()");
+  assert.match(await evaluate("document.querySelector('#resultCount').textContent"),/0 job openings/);
+  await evaluate("document.querySelector('#clearFilters').click();document.querySelector('[data-discover-location=\"Zamboanga\"]').click()");
+  assert.match(await evaluate("document.querySelector('#resultCount').textContent"),/0 job openings/);
+  await evaluate("document.querySelector('[data-discover-location=\"\"]').click()");
+  assert.match(await evaluate("document.querySelector('#resultCount').textContent"),/23 job openings/);
+  await evaluate("window.scrollTo(0,0)");
   const shot=await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:true});
   fs.writeFileSync(path.join(output,'vacancies-desktop.png'),Buffer.from(shot.data,'base64'));
   await evaluate("document.querySelector('[data-view=\"fairs\"]').click()");

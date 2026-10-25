@@ -1,0 +1,115 @@
+/* Public directory: a restrained editorial hierarchy and search-first layout. */
+body[data-portal="public"] {background:#fff;font-size:18px;line-height:1.6;}
+body[data-portal="public"] .main {background:#fff;}
+body[data-portal="public"] .site-header.vacancy-header {background:#fff;border-bottom:1px solid #e2e8e3;}
+body[data-portal="public"] .vacancy-header .topbar {max-width:1240px;min-height:96px;gap:24px;}
+body[data-portal="public"] .vacancy-header .brand-name {color:#173d2b;font-size:25px;}
+body[data-portal="public"] .vacancy-header .brand small {color:#718076;font-size:9px;letter-spacing:1.4px;}
+body[data-portal="public"] .brand-logo {width:52px;height:52px;}
+body[data-portal="public"] .vacancy-header .primary-nav {gap:22px;}
+body[data-portal="public"] .vacancy-header .nav-link {font-size:14px;color:#536159;padding:12px 0;}
+body[data-portal="public"] .vacancy-header .nav-link.active {color:#17623e;border-color:#17623e;}
+body[data-portal="public"] .vacancy-header .top-actions .btn {border-radius:5px;font-size:14px;padding:10px 19px;}
+body[data-portal="public"] .vacancy-header .signup-button {border-color:#c9d8ce;color:#205c3c;background:#fff;}
+body[data-portal="public"] main#content {max-width:1240px;padding:0 36px 72px;}
+.career-hero {margin:0 -36px;padding:65px 48px 28px;background:#f1f5f0;border-bottom:1px solid #dce5dd;}
+.hero-intro {position:relative;padding-bottom:32px;}
+.hero-eyebrow {font-size:11px;letter-spacing:2px;font-weight:700;color:#467153;margin:0 0 20px;}
+body .hero-intro h1 {font-size:clamp(34px,4.2vw,55px);line-height:1.15;letter-spacing:-1.8px;margin:0 0 22px;color:#193c2b;font-weight:650;}
+.hero-intro h1 span {color:#52765d;}
+body .hero-intro>p:not(.hero-eyebrow) {font-size:17px;line-height:1.8;color:#637068;}
+.hero-location {display:block;font-size:10px;letter-spacing:1.4px;color:#6e7e72;margin-top:23px;}
+body .career-hero .vacancy-search {background:#fff;border:1px solid #d9e3da;border-radius:8px;padding:24px 26px 0;box-shadow:0 8px 24px #233c2906;}
+body .career-hero .vacancy-search h2 {font-size:18px;letter-spacing:-.3px;}
+body .career-hero .vacancy-search>p {font-size:14px;margin:4px 0 18px;}
+body .career-hero .vacancy-search-form {gap:12px;}
+.search-field-label {display:block;font-size:12px;font-weight:650;margin-bottom:7px;color:#42584b;}
+body .career-hero .vacancy-search-form input {border:1px solid #d9e2dc;border-radius:4px;background:#fcfdfb;font-size:15px;height:50px;padding:12px 15px;}
+body .career-hero .vacancy-search-form .btn {align-self:flex-end;border-radius:4px;min-height:50px;font-size:15px;padding:0 28px;background:#216443;border-color:#216443;}
+body .career-hero .audience-filters {border:0;padding:19px 0 22px;gap:9px 20px;}
+body .career-hero .audience-filters>span {font-size:10px;letter-spacing:1px;}
+body .career-hero .audience-filters label {font-size:12px;}
+.browse-directory {padding:42px 0 38px;border-bottom:1px solid #e2e8e3;}
+.browse-title,.listings-heading {display:flex;align-items:center;justify-content:space-between;gap:20px;}
+body .section-kicker {font-size:10px;letter-spacing:1.6px;font-weight:650;color:#6c8271;}
+body .browse-title h2,body .listings-heading h2 {font-size:27px;font-weight:600;letter-spacing:-.8px;margin:7px 0 0;}
+.browse-title a {font-size:13px;color:#286442;text-decoration:none;}
+.browse-title a span {margin-left:15px;}
+.browse-columns {display:grid;grid-template-columns:1.3fr 1fr;gap:60px;margin-top:26px;}
+.browse-columns>div+div {border-left:1px solid #e2e8e3;padding-left:40px;}
+body .browse-columns h3 {font-size:14px;font-weight:600;margin-bottom:12px;letter-spacing:0;}
+.browse-links {display:grid;grid-template-columns:1fr 1fr;gap:0 25px;}
+.browse-links button {display:flex;justify-content:space-between;gap:12px;text-align:left;background:none;border:0;border-bottom:1px solid #edf0eb;padding:12px 0;color:#5d6c62;font-size:13px;min-height:44px;}
+.browse-links button:hover {color:#17623e;border-color:#8db39a;}
+.browse-links button span {color:#8aab93;}
+body .browse-note {font-size:11px;margin:12px 0 0;color:#8a948d;}
+.listings-heading {padding:35px 0 24px;}
+.listings-heading>span {font-size:12px;color:#7d8981;}
+body .vacancy-layout {grid-template-columns:minmax(0,1fr) 270px;gap:45px;}
+body .vacancy-sidebar {padding:22px;background:#f7f9f6;border:1px solid #e4eae2;border-radius:6px;}
+body .vacancy-toolbar {padding-top:0;}
+body .vacancy-toolbar>p,body .vacancy-toolbar select,body .vacancy-toolbar .text-button {font-size:13px;}
+body .vacancy-selects select {font-size:13px;border-radius:4px;max-width:205px;}
+body .vacancy-selects .saved-filter {font-size:12px;}
+body .vacancy-row {padding:26px 0;gap:17px;grid-template-columns:48px minmax(0,1fr) 140px;}
+body .vacancy-title {font-size:18px;text-transform:none;color:#215c3b;letter-spacing:-.3px;}
+body .vacancy-company {font-size:12px;text-transform:none;}
+body .vacancy-meta {font-size:12px;}
+body .vacancy-aside strong,body .vacancy-aside small,body .save-job {font-size:12px;}
+body .sidebar-section h2 {font-size:20px;letter-spacing:-.4px;}
+body .top-opening {font-size:12px;text-transform:none;}
+body .advice-tile {border-radius:4px;}
+body .advice-tile strong {font-size:20px;line-height:1.35;}
+body .advice-tile>span:last-child {font-size:12px;}
+body .employer-callout {border-radius:4px;background:#e6eee3;}
+body .employer-callout h2 {font-size:24px;}
+body .employer-callout p,body .employer-callout .btn {font-size:13px;}
+body .footer {background:#f4f6f2;padding:35px 36px 20px;border-top:1px solid #dfe6dc;}
+.footer-inner,.footer-bottom {max-width:1168px;margin:auto;display:flex;justify-content:space-between;gap:22px;}
+.footer-inner strong {font-size:22px;color:#254f35;}
+body .footer-inner p {font-size:12px;margin:7px 0 22px;}
+.footer-inner>div+div {display:flex;gap:24px;align-items:center;flex-wrap:wrap;}
+.footer-inner a {font-size:12px;color:#58705f;text-decoration:none;}
+.footer-bottom {border-top:1px solid #dde5d9;padding-top:17px;font-size:10px;color:#7d8b80;flex-wrap:wrap;}
+button:focus-visible,a:focus-visible {outline:3px solid #88b499;outline-offset:4px;}
+@media(max-width:1050px) and (min-width:801px){body[data-portal="public"] .vacancy-header .primary-nav {order:3;justify-content:flex-start;flex-basis:100%;}body[data-portal="public"] .vacancy-header .top-actions {margin-left:auto;}.browse-columns{gap:30px;}body .vacancy-layout{gap:24px;grid-template-columns:minmax(0,1fr) 235px;}}
+@media(max-width:800px){
+ body[data-portal="public"] main#content {padding:0 22px 30px;}
+ body[data-portal="public"] .vacancy-header .topbar {min-height:80px;padding:14px 0;}
+ body[data-portal="public"] .vacancy-header .brand-name {font-size:21px;}
+ body[data-portal="public"] .vacancy-header .brand small {font-size:8px;letter-spacing:.5px;}
+ body[data-portal="public"] .mobile-welcome,body[data-portal="public"] .mobile-page-heading,body[data-portal="public"] .mobile-discovery {display:none;}
+ .career-hero {margin:0 -22px;padding:35px 22px 23px;}
+ body .hero-intro h1 {font-size:36px;letter-spacing:-1.2px;}
+ .hero-eyebrow {font-size:9px;letter-spacing:1.5px;}
+ body .hero-intro>p:not(.hero-eyebrow) {font-size:15px;}
+ .desktop-break {display:none;}
+ .hero-location {font-size:8px;letter-spacing:.8px;}
+ body .career-hero .vacancy-search {padding:19px 16px 16px;}
+ body .career-hero .vacancy-search-form {display:flex;flex-wrap:wrap;background:none;border:0;border-radius:0;box-shadow:none;padding:0;}
+ body .career-hero .vacancy-search-form label {flex:1 1 100%;}
+ body .career-hero #mobileLocationFilters {display:block;}
+ body .career-hero .vacancy-search-form .btn {display:flex;flex:1;align-items:center;justify-content:center;gap:9px;margin:0;}
+ body .career-hero .vacancy-search-form .btn span {display:inline;}
+ body .career-hero .mobile-search-icon {width:19px;height:19px;}
+ body .career-hero .mobile-filter-toggle {border-radius:4px;min-height:50px;}
+ body .career-hero #mobileAudienceFilters {padding-bottom:0;}
+ .browse-directory {padding:28px 0;}
+ body .browse-title h2,body .listings-heading h2 {font-size:24px;}
+ .browse-title {align-items:flex-start;}
+ .browse-title a {font-size:11px;max-width:70px;}
+ .browse-columns {grid-template-columns:1fr;gap:24px;}
+ .browse-columns>div+div {border-left:0;padding-left:0;}
+ .browse-links {gap:0 20px;}
+ .browse-links button {font-size:12px;}
+ .listings-heading {padding-top:28px;}
+ .listings-heading>span {display:none;}
+ body .vacancy-layout {display:block;}
+ body .vacancy-row {grid-template-columns:42px minmax(0,1fr);padding:20px 16px;gap:12px;}
+ body .vacancy-aside {grid-column:2;flex-direction:row;flex-wrap:wrap;justify-content:space-between;align-items:center;}
+ body .vacancy-title {font-size:17px;}
+ body .vacancy-selects select {max-width:100%;}
+ .footer-inner {flex-direction:column;gap:0;}
+ .footer-inner>div+div {padding-bottom:20px;gap:18px;}
+ body .footer {padding:28px 22px 120px;}
+}

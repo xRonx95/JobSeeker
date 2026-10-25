@@ -1,0 +1,72 @@
+/* Administration only. Shared controls remain in assets/css/. */
+body[data-portal="admin"] {--heading:#203d30;--ink:#40554a;--muted:#748179;--line:#e0e7e1;background:#f4f6f4;font-family:"Segoe UI",Arial,sans-serif;font-size:16px;line-height:1.6;}
+body[data-portal="admin"] .main {background:#f4f6f4;min-height:100vh;}
+body[data-portal="admin"] .site-header.vacancy-header {background:#fff;border-bottom:1px solid #dfe6df;padding:0 36px;}
+body[data-portal="admin"] .vacancy-header .topbar {max-width:1440px;min-height:94px;padding:18px 0;gap:22px;}
+body[data-portal="admin"] .vacancy-header .brand-name {color:#214332;font-size:25px;}
+body[data-portal="admin"] .vacancy-header .brand small {color:#7b8b7f;font-size:9px;letter-spacing:1.8px;}
+body[data-portal="admin"] .brand-logo {width:50px;height:50px;border-radius:6px;}
+body[data-portal="admin"] .vacancy-header .primary-nav {gap:20px;}
+body[data-portal="admin"] .vacancy-header .nav-link {font-size:13px;font-weight:500;color:#617167;min-height:40px;}
+body[data-portal="admin"] .vacancy-header .nav-link.active {color:#215d3c;border-color:#215d3c;}
+body[data-portal="admin"] .vacancy-header .top-actions .btn {border-radius:5px;font-size:13px;padding:9px 17px;}
+body[data-portal="admin"] .vacancy-header .btn.outline {color:#335c43;border-color:#cbd9cf;background:#fff;}
+body[data-portal="admin"] main#content {max-width:1400px;padding:0 36px 65px;}
+body[data-portal="admin"] #content>.view:not(#home) {margin:38px 0 0;}
+body[data-portal="admin"] .page-title {padding:0 0 28px;border-bottom:1px solid #dfe6df;margin-bottom:28px;}
+body[data-portal="admin"] .page-title .eyebrow {font-size:10px;letter-spacing:1.8px;color:#6c8974;}
+body[data-portal="admin"] .page-title h1 {font-size:34px;font-weight:650;letter-spacing:-1px;margin:10px 0;}
+body[data-portal="admin"] .page-title p {font-size:14px;max-width:720px;line-height:1.8;}
+body[data-portal="admin"] #adminContent>.section-head {display:flex;align-items:center;gap:12px;margin:0 0 24px;}
+body[data-portal="admin"] .section-head h2 {font-size:19px;font-weight:600;letter-spacing:-.3px;}
+body[data-portal="admin"] .btn,body[data-portal="admin"] .mini {border-radius:5px;font-size:13px;min-height:40px;box-shadow:none;}
+body[data-portal="admin"] .btn {background:#276345;border-color:#276345;}
+body[data-portal="admin"] [data-manage-resources] {background:#fff;color:#45614e;border:1px solid #cddacf;}
+body[data-portal="admin"] .stats-row {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;margin-bottom:28px;}
+body[data-portal="admin"] .stat-mini {background:#fff;border:1px solid #e0e7df;border-top:3px solid #789681;border-radius:6px;box-shadow:0 3px 10px #29412b03;padding:22px 24px;}
+body[data-portal="admin"] .stat-mini b {display:block;font-size:32px;font-weight:600;line-height:1.2;letter-spacing:-1px;color:#234c34;}
+body[data-portal="admin"] .stat-mini span {display:block;font-size:12px;color:#7b897e;margin-top:10px;}
+body[data-portal="admin"] .panel {background:#fff;border:1px solid #e0e7df;border-radius:7px;box-shadow:0 3px 12px #2f422e03;padding:24px;}
+body[data-portal="admin"] .tabs {display:flex;flex-wrap:wrap;gap:6px;border-bottom:1px solid #e3e9e2;padding-bottom:16px;margin-bottom:20px;}
+body[data-portal="admin"] .tab {font-size:13px;color:#718076;min-height:42px;border:1px solid transparent;border-radius:4px;background:transparent;padding:9px 18px;}
+body[data-portal="admin"] .tab.active {background:#eaf2eb;color:#285d3c;border-color:#dce8dc;font-weight:600;}
+body[data-portal="admin"] table {font-size:13px;width:100%;border-collapse:collapse;}
+body[data-portal="admin"] th {font-size:10px;letter-spacing:.7px;text-transform:uppercase;color:#718276;background:#f6f8f4;padding:14px 16px;border-bottom:1px solid #e1e7de;}
+body[data-portal="admin"] td {padding:17px 16px;border-bottom:1px solid #ecf0e9;vertical-align:middle;color:#66766a;}
+body[data-portal="admin"] td strong {font-weight:600;color:#304d39;}
+body[data-portal="admin"] td small {font-size:11px;color:#8a968c;}
+body[data-portal="admin"] tbody tr:hover {background:#fafcf8;}
+body[data-portal="admin"] .pill {font-size:10px;padding:4px 10px;border-radius:4px;text-transform:capitalize;letter-spacing:.2px;}
+body[data-portal="admin"] input,body[data-portal="admin"] select,body[data-portal="admin"] textarea {border:1px solid #d7e0d6;border-radius:4px;font-size:14px;min-height:43px;background:#fff;box-shadow:none;}
+body[data-portal="admin"] input:focus,body[data-portal="admin"] select:focus,body[data-portal="admin"] textarea:focus {outline:2px solid #7da88b;outline-offset:2px;}
+body[data-portal="admin"] input[type="checkbox"] {min-height:0;}
+body[data-portal="admin"] td select {font-size:12px;min-height:36px;padding:6px 10px;}
+body[data-portal="admin"] label {font-size:13px;font-weight:500;color:#4f6655;}
+body[data-portal="admin"] .admin-pagination {margin:22px 0 0;padding-top:18px;border-top:1px solid #e4eae0;font-size:12px;}
+body[data-portal="admin"] .admin-pagination .mini {font-size:12px;background:#fff;color:#4f7057;border:1px solid #dbe4d8;}
+body[data-portal="admin"] .form-panel {max-width:850px;}
+body[data-portal="admin"] .modal {border:1px solid #d6e1d7;border-radius:10px;box-shadow:0 24px 80px #112b2430;}
+body[data-portal="admin"] .modal h2 {font-size:25px;font-weight:600;letter-spacing:-.5px;}
+body[data-portal="admin"] .modal p {font-size:13px;}
+body[data-portal="admin"] .footer {background:#eef2ec;border-top:1px solid #dce4d9;padding:22px 36px;color:#829080;font-size:11px;letter-spacing:.3px;}
+body[data-portal="admin"] button:focus-visible {outline:2px solid #729e7e;outline-offset:3px;}
+@media(max-width:1100px){body[data-portal="admin"] .vacancy-header .primary-nav{order:3;flex-basis:100%;justify-content:flex-start;}body[data-portal="admin"] .vacancy-header .top-actions{margin-left:auto;}}
+@media(max-width:800px){
+ body[data-portal="admin"] .site-header.vacancy-header{padding:0 20px;}
+ body[data-portal="admin"] .vacancy-header .topbar{min-height:78px;gap:12px;}
+ body[data-portal="admin"] .vacancy-header .brand-name{font-size:22px;}
+ body[data-portal="admin"] .vacancy-header .brand small{font-size:8px;letter-spacing:1px;}
+ body[data-portal="admin"] .vacancy-header .primary-nav{gap:8px;}
+ body[data-portal="admin"] main#content{padding:0 20px 35px;max-width:none;}
+ body[data-portal="admin"] .page-title h1{font-size:29px;}
+ body[data-portal="admin"] .stats-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+ body[data-portal="admin"] .stat-mini{padding:18px 16px;}
+ body[data-portal="admin"] .stat-mini b{font-size:28px;}
+ body[data-portal="admin"] #adminContent>.section-head{align-items:stretch;flex-wrap:wrap;}
+ body[data-portal="admin"] .section-head h2{flex-basis:100%;}
+ body[data-portal="admin"] .panel{padding:16px;min-width:0;}
+ body[data-portal="admin"] .tab{padding:8px 11px;font-size:12px;}
+ body[data-portal="admin"] .admin-pagination{flex-wrap:wrap;gap:10px;}
+ body[data-portal="admin"] .mobile-dock{display:none;}
+ body[data-portal="admin"] .footer{padding:22px 20px;}
+}

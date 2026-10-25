@@ -32,6 +32,10 @@ isabela-careers-role-folders/
 
 ### Administrator account creation and public signup
 
+If Add user fails, the dialog now distinguishes expired sessions, unavailable API routes, hosting timeouts, rejected server credentials, and database errors. A timeout can leave an account created even when its response was lost; check All users and Supabase Authentication for the email before retrying. Do not reset or recreate an existing account to diagnose this error. For an HTTP 500/502/504 response, inspect the `/api/admin/users` function in Vercel logs using the deployment reference shown in the dialog. Never share session tokens, passwords, or server keys in a bug report.
+
+The account endpoint has an explicit 60-second hosting limit in `vercel.json`, following [Vercel's function duration configuration](https://vercel.com/docs/functions/configuring-functions/duration), with each upstream request limited to 10 seconds so error handling and rollback can finish. Deploy both the API/configuration and browser changes together; local edits do not repair an existing live deployment.
+
 1. In Vercel Project Settings > Environment Variables, set `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, and `SUPABASE_SECRET_KEY` for each deployment environment you use. See [.env.example](.env.example) for names. Use a current server secret key; do not put it in `config.js` or browser assets.
 2. Deploy this whole project, including `api/admin/users.mjs`, to Vercel. The API uses Node.js and has no package dependencies; serving only the HTML files does not run it.
 3. In the existing Supabase project's SQL Editor, run [migrations/004-public-seeker-company-signup.sql](migrations/004-public-seeker-company-signup.sql). It supersedes migration 003, restores public signup for seekers and companies, and allows only trusted administrator metadata to assign admin roles. Existing accounts and passwords are unchanged. Do not rerun the original schema or apply migration 003 after migration 004.

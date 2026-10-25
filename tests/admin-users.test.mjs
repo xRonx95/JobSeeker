@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHandler } from '../api/admin/users.mjs';
+import fs from 'node:fs';
+import vm from 'node:vm';
 
 const env = { SUPABASE_URL: 'https://project.supabase.co', SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_test', SUPABASE_SECRET_KEY: 'sb_secret_test' };
 const valid = { full_name: 'New user', email: 'new@example.test', role: 'seeker', password: '' };
@@ -14,6 +16,8 @@ function fixture(options = {}) {
     if (endpoint === '/auth/v1/user') return reply({ id: 'caller' }, options.expired ? 401 : 200);
     if (endpoint === '/rest/v1/profiles' && init.method === 'GET') return reply([{ role: options.callerRole || 'admin', approval_status: options.status || 'active' }]);
     if (endpoint === '/auth/v1/admin/users' && init.method === 'POST') {
+      if (options.createTimeout) throw new DOMException('Timed out', 'TimeoutError');
+      if (options.createError) return reply(options.createError, options.createStatus || 500);
       if (options.duplicate) return reply({ code: 'email_exists' }, 422);
       if (options.weak) return reply({ code: 'weak_password' }, 422);
       return reply({ id: 'created' });
@@ -98,4 +102,38 @@ test('handles missing server settings, invalid JSON, and unsupported methods', a
   assert.equal((await fixture({ env: {} }).run()).status, 503);
   assert.equal((await fixture().run('{')).status, 400);
   const mock = fixture(); assert.equal((await mock.run(valid, '', 'GET')).status, 405); assert.equal(mock.calls.length, 0);
+});
+
+test('an interrupted creation reports an uncertain outcome without retrying or deleting', async () => {
+  const mock = fixture({ createTimeout: true });
+  const response = await mock.run();
+  assert.equal(response.status, 504);
+  assert.match(response.body.error, /may already exist/);
+  assert.equal(mock.calls.filter(call => call.endpoint === '/auth/v1/admin/users').length, 1);
+  assert.ok(!mock.calls.some(call => call.method === 'DELETE'));
+  assert.equal(response.body.temporary_password, undefined);
+});
+
+test('invalid server credentials and database trigger failures have actionable messages', async () => {
+  const credential = await fixture({ createError: { message: 'Invalid API key' }, createStatus: 401 }).run();
+  assert.equal(credential.status, 503);
+  assert.match(credential.body.error, /SUPABASE_SECRET_KEY/);
+  const database = await fixture({ createError: { code: 'unexpected_failure', msg: 'Database error saving new user' } }).run();
+  assert.equal(database.status, 502);
+  assert.match(database.body.error, /004-public-seeker-company-signup/);
+  assert.ok(!JSON.stringify(credential.body).includes(env.SUPABASE_SECRET_KEY));
+});
+
+test('the browser explains non-JSON hosting failures and preserves server validation errors', () => {
+  const context = { window: {} };
+  vm.runInNewContext(fs.readFileSync(new URL('../assets/js/admin-users.js', import.meta.url), 'utf8'), context);
+  const explain = context.window.IsabelaAdminUsers.responseError;
+  for (const status of [401, 403, 404, 405, 429, 500, 502, 504]) {
+    const message = explain(new Response('Hosting error', { status }), null);
+    assert.ok(message.length > 30);
+    assert.ok(!message.startsWith('Account creation failed.'));
+  }
+  assert.match(explain(new Response('', { status: 504 }), null), /may already exist/);
+  assert.match(explain(new Response('', { status: 500, headers: { 'x-vercel-id': 'diagnostic-reference' } }), null), /diagnostic-reference/);
+  assert.equal(explain(new Response('', { status: 409 }), { error: 'Email already exists' }), 'Email already exists');
 });

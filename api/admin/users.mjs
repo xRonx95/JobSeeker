@@ -35,7 +35,7 @@ export function createHandler({ fetcher = fetch, env = process.env } = {}) {
             Prefer: 'return=representation,resolution=merge-duplicates',
           },
           body: body === undefined ? undefined : JSON.stringify(body),
-          signal: AbortSignal.timeout(15000),
+          signal: AbortSignal.timeout(10000),
         });
         const data = await response.json().catch(() => null);
         return { response, data };
@@ -73,19 +73,28 @@ export function createHandler({ fetcher = fetch, env = process.env } = {}) {
       if (typeof password !== 'string' || password.length < 8 || password.length > 128)
         throw new ApiError(400, 'Use an initial password with 8–128 characters.');
 
-      const created = await request('/auth/v1/admin/users', {
-        method: 'POST', privileged: true,
-        body: {
-          email, password, email_confirm: true,
-          user_metadata: { full_name: name, requested_role: role === 'company' ? 'company' : 'seeker', company_name: role === 'company' ? company : '' },
-          app_metadata: { portal_created_by_admin: true, portal_role: role, portal_created_by: callerId },
-        },
-      });
+      let created;
+      try {
+        created = await request('/auth/v1/admin/users', {
+          method: 'POST', privileged: true,
+          body: {
+            email, password, email_confirm: true,
+            user_metadata: { full_name: name, requested_role: role === 'company' ? 'company' : 'seeker', company_name: role === 'company' ? company : '' },
+            app_metadata: { portal_created_by_admin: true, portal_role: role, portal_created_by: callerId },
+          },
+        });
+      } catch {
+        throw new ApiError(504, 'The connection to Supabase was interrupted during account creation. Check this email in All users and Supabase Authentication before retrying; the account may already exist.');
+      }
       if (!created.response.ok) {
         const code = created.data?.code || created.data?.error_code;
         if (['email_exists', 'user_already_exists'].includes(code) || /already.*registered|already.*exists/i.test(created.data?.msg || created.data?.message || ''))
           throw new ApiError(409, 'An account with this email already exists. Its password and role were not changed.');
         if (created.response.status === 429) throw new ApiError(429, 'Too many account requests. Please try again later.');
+        if ([401, 403].includes(created.response.status))
+          throw new ApiError(503, 'Supabase rejected the server credential. The site owner must verify SUPABASE_SECRET_KEY belongs to the configured project in Vercel, then redeploy.');
+        if (/database error/i.test(created.data?.msg || created.data?.message || ''))
+          throw new ApiError(502, 'Supabase could not save the new account because of a database error. The site owner must check the Auth logs and apply migrations/004-public-seeker-company-signup.sql to the existing database.');
         if (code === 'weak_password') throw new ApiError(400, 'The password does not meet the project password requirements. Choose a stronger password or leave it blank to generate one.');
         throw new ApiError(502, 'Supabase could not create the account. Check the server configuration and database migration.');
       }

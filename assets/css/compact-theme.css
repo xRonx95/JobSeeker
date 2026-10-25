@@ -1,0 +1,126 @@
+/* Final shared sizing layer. Keep this after page-specific stylesheets. */
+body[data-portal] {font-size:14px;line-height:1.55;}
+body[data-portal] h1,body[data-portal] h2,body[data-portal] h3,body[data-portal] h4,body[data-portal] button,body[data-portal] input,body[data-portal] select,body[data-portal] textarea {font-family:"Segoe UI",Arial,sans-serif;}
+body[data-portal] h1 {font-size:28px;line-height:1.25;font-weight:600;letter-spacing:-.6px;}
+body[data-portal] h2 {font-size:20px;line-height:1.35;font-weight:600;letter-spacing:-.3px;}
+body[data-portal] h3 {font-size:16px;font-weight:600;letter-spacing:0;}
+body[data-portal] p,body[data-portal] .muted,body[data-portal] .dialog-body>p {font-size:14px;line-height:1.65;}
+body[data-portal] .site-header.vacancy-header {padding:0 28px;}
+body[data-portal] .vacancy-header .topbar {min-height:76px;gap:18px;padding:12px 0;max-width:1240px;}
+body[data-portal] .brand-logo {width:44px;height:44px;border-radius:6px;}
+body[data-portal] .vacancy-header .brand-name {font-size:21px;font-weight:650;letter-spacing:-.4px;}
+body[data-portal] .vacancy-header .brand small {font-size:8px;letter-spacing:.7px;margin-top:5px;}
+body[data-portal] .vacancy-header .primary-nav {gap:14px;}
+body[data-portal] .vacancy-header .nav-link {font-size:12px;font-weight:500;padding:10px 0;min-height:38px;}
+body[data-portal] .vacancy-header .top-actions .btn {font-size:12px;min-height:36px;border-radius:4px;padding:8px 14px;}
+body[data-portal] .page-title {padding-bottom:20px;margin-bottom:22px;}
+body[data-portal] .page-title h1,body[data-portal] .vacancy-heading h1 {font-size:28px;}
+body[data-portal] .page-title p,body[data-portal] .vacancy-heading p:not(.breadcrumb),body[data-portal] .vacancy-search>p {font-size:14px;}
+body[data-portal] .vacancy-heading {padding:25px 0 26px;}
+body[data-portal] .breadcrumb {font-size:11px;}
+body[data-portal] .local-badge {font-size:10px;letter-spacing:1.2px;}
+body[data-portal] .section-kicker,body[data-portal] .eyebrow.dark {font-size:10px;letter-spacing:1.2px;}
+body[data-portal] .vacancy-search h2 {font-size:20px;}
+body[data-portal] label {font-size:13px;}
+body[data-portal] input,body[data-portal] select,body[data-portal] textarea {font-size:14px;border-radius:4px;}
+body[data-portal] input,body[data-portal] select {min-height:40px;}
+body[data-portal] input[type="checkbox"] {min-height:0;width:15px;height:15px;}
+body[data-portal] .btn,body[data-portal] .mini {font-size:13px;min-height:38px;border-radius:4px;padding:8px 16px;}
+body[data-portal] .text-button,body[data-portal] .text-btn {font-size:12px;}
+body[data-portal] .vacancy-search-form input {height:42px;font-size:14px;}
+body[data-portal] .vacancy-search-form .btn {font-size:13px;min-height:42px;padding:0 22px;}
+body[data-portal] .audience-filters {gap:9px 16px;padding:14px 0 16px;}
+body[data-portal] .audience-filters>span {font-size:10px;letter-spacing:1px;}
+body[data-portal] .audience-filters label,body[data-portal] .saved-filter {font-size:12px;}
+body[data-portal] .vacancy-toolbar>p,body[data-portal] .vacancy-toolbar select,body[data-portal] .vacancy-toolbar .text-button {font-size:12px;}
+body[data-portal] .vacancy-selects select {font-size:12px;min-height:36px;max-width:210px;}
+body[data-portal] .vacancy-row {padding:20px 0;}
+body[data-portal] .vacancy-title {font-size:16px;line-height:1.4;font-weight:600;text-transform:none;}
+body[data-portal] .vacancy-company {font-size:12px;text-transform:none;margin:5px 0 7px;}
+body[data-portal] .vacancy-meta {font-size:12px;}
+body[data-portal] .vacancy-aside strong,body[data-portal] .vacancy-aside small,body[data-portal] .save-job {font-size:11px;}
+body[data-portal] .audience-tags span {font-size:10px;}
+body[data-portal] .sidebar-section h2 {font-size:18px;}
+body[data-portal] .top-opening {font-size:12px;min-height:36px;}
+body[data-portal] .top-opening small {font-size:10px;}
+body[data-portal] .advice-tile {padding:18px 16px;}
+body[data-portal] .advice-tile strong {font-size:18px;line-height:1.4;}
+body[data-portal] .advice-tile .section-kicker {font-size:9px;}
+body[data-portal] .advice-tile>span:last-child {font-size:11px;}
+body[data-portal] .employer-callout h2 {font-size:22px;}
+body[data-portal] .employer-callout p,body[data-portal] .employer-callout .btn,body[data-portal] .compact-metrics span,body[data-portal] .safety-note {font-size:12px;}
+body[data-portal] .resource-card p,body[data-portal] .resource-body,body[data-portal] .directory-search,body[data-portal] .resource-admin-row p {font-size:14px;}
+body[data-portal] .panel {border-radius:6px;}
+body[data-portal] .tab {font-size:12px;min-height:38px;}
+body[data-portal] th {font-size:11px;}
+body[data-portal] td {font-size:13px;}
+body[data-portal] td small {font-size:11px;}
+body[data-portal] .stat-mini b {font-size:26px;font-weight:600;}
+body[data-portal] .stat-mini span {font-size:11px;letter-spacing:.3px;}
+body[data-portal] .pagination,body[data-portal] .pagination .mini {font-size:12px;}
+body[data-portal] .footer {font-size:11px;}
+/* Public search landing page. */
+body[data-portal="public"] .career-hero {padding:42px 40px 24px;}
+body[data-portal="public"] .hero-intro {padding-bottom:23px;}
+body[data-portal="public"] .hero-intro .hero-eyebrow {font-size:10px;margin-bottom:16px;}
+body[data-portal="public"] .hero-intro h1 {font-size:38px;line-height:1.2;letter-spacing:-1px;margin-bottom:16px;}
+body[data-portal="public"] .hero-intro>p:not(.hero-eyebrow) {font-size:14px;line-height:1.75;}
+body[data-portal="public"] .hero-location {font-size:9px;margin-top:18px;}
+body[data-portal="public"] .career-hero .vacancy-search {padding:20px 22px 0;}
+body[data-portal="public"] .career-hero .vacancy-search h2 {font-size:17px;}
+body[data-portal="public"] .career-hero .vacancy-search>p {font-size:13px;}
+body[data-portal="public"] .career-hero .vacancy-search-form input {height:42px;font-size:14px;}
+body[data-portal="public"] .career-hero .vacancy-search-form .btn {min-height:42px;font-size:13px;}
+body[data-portal="public"] .browse-directory {padding:30px 0;}
+body[data-portal="public"] .browse-title h2,body[data-portal="public"] .listings-heading h2 {font-size:23px;}
+body[data-portal="public"] .listings-heading {padding:27px 0 20px;}
+/* Administrative hierarchy stays compact without reducing table readability. */
+body[data-portal="admin"] .page-title h1 {font-size:28px;}
+body[data-portal="admin"] .section-head h2 {font-size:18px;}
+body[data-portal="admin"] .stats-row {gap:16px;margin-bottom:22px;}
+body[data-portal="admin"] .stat-mini {padding:18px 20px;}
+body[data-portal="admin"] .stat-mini b {font-size:27px;}
+body[data-portal="admin"] td {padding:13px 14px;}
+/* Account dialogs use the same restrained type scale. */
+body[data-portal] .auth-card {width:min(520px,calc(100% - 28px));border-radius:8px;}
+body[data-portal] .auth-card-body {padding:26px 48px 30px;}
+body[data-portal] .auth-card .auth-logo {width:68px;height:68px;}
+body[data-portal] .auth-card .auth-brand-name {font-size:17px;margin-bottom:15px;}
+body[data-portal] .auth-card h2 {font-size:23px;font-weight:600;margin:10px 0;}
+body[data-portal] #authSubtitle {font-size:13px;margin-bottom:20px;}
+body[data-portal] .auth-card label {font-size:13px;margin-bottom:13px;}
+body[data-portal] .auth-card input,body[data-portal] .auth-card select {font-size:14px;min-height:42px;}
+body[data-portal] .auth-card .auth-submit {font-size:14px;min-height:42px;border-radius:4px;padding:10px 18px;}
+body[data-portal] .auth-forgot,body[data-portal] #authSwitchPrompt,body[data-portal] .auth-switch,body[data-portal] #authStatus {font-size:13px;}
+body[data-portal] .auth-card .auth-switch.signup-callout {font-size:13px;border-radius:4px;padding:9px 12px;}
+body[data-portal] .auth-card .consent-label {font-size:12px;}
+body[data-portal] #createdUserDetails p,body[data-portal] #addUserForm>p {font-size:13px;}
+@media(min-width:1101px){body[data-portal] .vacancy-header .primary-nav{order:0;flex-basis:auto;}body[data-portal] .vacancy-header .top-actions{margin-left:auto;}}
+@media(max-width:800px){
+ body[data-portal] .site-header.vacancy-header{padding-left:20px;padding-right:20px;}
+ body[data-portal] .vacancy-header .topbar{min-height:70px;padding:12px 0;gap:10px;}
+ body[data-portal] .vacancy-header .brand-name{font-size:20px;}
+ body[data-portal] .vacancy-header .brand small{font-size:8px;}
+ body[data-portal] .vacancy-header .nav-link{font-size:13px;min-height:44px;}
+ body[data-portal] .page-title h1,body[data-portal] .vacancy-heading h1{font-size:25px;}
+ body[data-portal] .btn,body[data-portal] .mini{min-height:44px;}
+ body[data-portal] input,body[data-portal] select,body[data-portal] textarea{font-size:16px;}
+ body[data-portal] input,body[data-portal] select{min-height:44px;}
+ body[data-portal] input[type="checkbox"]{min-height:0;}
+ body[data-portal] .vacancy-search-form input{font-size:16px;height:44px;}
+ body[data-portal] .vacancy-row{padding:18px 16px;}
+ body[data-portal] .mobile-page-heading h1{font-size:32px;line-height:1.2;}
+ body[data-portal] .mobile-welcome p{font-size:18px;}
+ body[data-portal] .mobile-feature h2{font-size:27px;}
+ body[data-portal="public"] .career-hero{padding:28px 22px 22px;}
+ body[data-portal="public"] .hero-intro h1{font-size:30px;letter-spacing:-.8px;}
+ body[data-portal="public"] .career-hero .vacancy-search{padding:18px 16px;}
+ body[data-portal="public"] .career-hero .vacancy-search-form input{font-size:16px;min-height:44px;}
+ body[data-portal="public"] .career-hero .vacancy-search-form .btn{min-height:44px;}
+ body[data-portal] .vacancy-selects select{max-width:100%;min-height:44px;font-size:16px;}
+ body[data-portal] .auth-card-body{padding:25px 22px;}
+ body[data-portal] .auth-card input,body[data-portal] .auth-card select{font-size:16px;min-height:44px;}
+ body[data-portal] .auth-card .auth-submit{min-height:44px;}
+ body[data-portal="admin"] .stat-mini{padding:16px;}
+ body[data-portal="admin"] .stat-mini b{font-size:25px;}
+}
